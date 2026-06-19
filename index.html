@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PageTurn — High-Fidelity Prototype v13</title>
+<title>PageTurn — High-Fidelity Prototype v14</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -52,11 +52,11 @@ button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{colo
 .input:focus{border-color:var(--coral);}
 .label{display:block;margin-bottom:8px;font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;}
 
-/* Home Hero Background & Cover (NEW) */
+/* Home Hero Background & Cover */
 .home-hero{
   position:relative; width:100%; height:480px; background-size:cover; background-position:center;
   display:flex; flex-direction:column; justify-content:flex-end; padding:40px 24px; color:#fff;
-  transition: background-image 0.5s ease;
+  transition: background-image 0.6s ease-in-out;
 }
 .home-hero::after{
   content:''; position:absolute; inset:0;
@@ -69,8 +69,32 @@ button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{colo
 
 /* Animations */
 @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideLeftFade { 0% { opacity:0; transform:translateX(40px); } 100% { opacity:1; transform:translateX(0); } }
+@keyframes subtleZoom { 0% { transform:scale(1); } 100% { transform:scale(1.08); } }
+@keyframes popUpFade { 0% { opacity:0; transform:translateY(50px) scale(0.95); } 100% { opacity:1; transform:translateY(0) scale(1); } }
+
 .anim-fade-up { opacity:0; animation: fadeInUp 0.6s ease forwards; }
+.hero-slide-left { opacity:0; animation: slideLeftFade 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 .d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.2s; } .d-3 { animation-delay: 0.3s; }
+
+/* Welcome Screen Cinematic BG */
+.welcome-bg-wrapper { position:absolute; inset:0; z-index:0; overflow:hidden; background:#000; }
+.welcome-bg { 
+  width:100%; height:100%; 
+  background: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1600&q=80') center/cover;
+  opacity: 0.25; animation: subtleZoom 20s infinite alternate ease-in-out;
+}
+.welcome-gradient {
+  position:absolute; inset:0; background:linear-gradient(to top, var(--bg) 15%, transparent 60%);
+}
+
+/* Paywall Box Animation */
+.paywall-box{
+  text-align:center; padding:40px 24px; background:var(--surface); border:1px solid var(--gold); border-radius:16px; 
+  margin:40px auto; max-width:600px; box-shadow:0 15px 40px rgba(217,119,6,.15);
+  opacity:0; transform:translateY(50px) scale(0.95);
+  animation: popUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
 
 /* Layouts */
 .section{margin:0 24px 40px;}
@@ -195,20 +219,31 @@ button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{colo
     </div>
   </section>
 
-  <!-- WELCOME -->
+  <!-- WELCOME (Animated Cinematic BG) -->
   <section class="screen" id="s-welcome-social">
-    <div class="scroll">
+    <div class="welcome-bg-wrapper">
+      <div class="welcome-bg"></div>
+      <div class="welcome-gradient"></div>
+    </div>
+    <div class="scroll" style="position:relative; z-index:10;">
       <div style="padding:120px 24px 40px; max-width:800px; margin:0 auto;">
-        <span class="pill success" style="margin-bottom:24px; background:#d1fae5; color:#047857; border:none;">JOIN 2,000,000+ READERS</span>
-        <h1 class="title-serif" style="font-size:48px; line-height:1.1; margin-bottom:16px;">Find your next book.<br>Keep reading every day.</h1>
-        <p class="subtle" style="font-size:18px; margin-bottom:48px;">Unlimited access to thousands of audiobooks, ebooks, and more.</p>
-        <div style="display:flex; gap:16px; margin-bottom:48px;">
-          <div class="card" style="flex:1; padding:24px; text-align:center;"><strong style="display:block; font-size:24px;">50K+</strong><span class="label">Books</span></div>
-          <div class="card" style="flex:1; padding:24px; text-align:center;"><strong style="display:block; font-size:24px;">4.8★</strong><span class="label">Rating</span></div>
+        <span class="pill success anim-fade-up" style="margin-bottom:24px; background:#d1fae5; color:#047857; border:none;">JOIN 2,000,000+ READERS</span>
+        <h1 class="title-serif anim-fade-up d-1" style="font-size:48px; line-height:1.1; margin-bottom:16px; color:#fff;">Find your next book.<br>Keep reading every day.</h1>
+        <p class="anim-fade-up d-2" style="font-size:18px; margin-bottom:48px; color:rgba(255,255,255,0.8);">Unlimited access to thousands of audiobooks, ebooks, and more.</p>
+        
+        <div class="anim-fade-up d-3" style="display:flex; gap:16px; margin-bottom:48px;">
+          <div class="card" style="flex:1; padding:24px; text-align:center; background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); backdrop-filter:blur(8px); color:#fff;">
+            <strong style="display:block; font-size:24px;">50K+</strong><span class="label" style="color:#e2e8f0;">Books</span>
+          </div>
+          <div class="card" style="flex:1; padding:24px; text-align:center; background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); backdrop-filter:blur(8px); color:#fff;">
+            <strong style="display:block; font-size:24px;">4.8★</strong><span class="label" style="color:#e2e8f0;">Rating</span>
+          </div>
         </div>
-        <button class="primary" onclick="go('s-signup')">Sign in with Email</button>
-        <div style="height:16px;"></div>
-        <button class="secondary" onclick="loginGuest()">Browse as Guest (Sample Mode)</button>
+        <div class="anim-fade-up d-3">
+          <button class="primary" onclick="go('s-signup')">Sign in with Email</button>
+          <div style="height:16px;"></div>
+          <button class="secondary" style="background:rgba(255,255,255,0.9); border:none;" onclick="loginGuest()">Browse as Guest (Sample Mode)</button>
+        </div>
       </div>
     </div>
   </section>
@@ -327,17 +362,17 @@ button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{colo
     </div>
   </section>
 
-  <!-- HOME w/ Animated Hero Cover -->
+  <!-- HOME w/ Animated Auto-Scrolling Hero Cover -->
   <section class="screen" id="s-home">
     <div class="scroll">
       <div class="home-hero anim-fade-up" id="home-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80');">
-        <div class="home-hero-content">
+        <div class="home-hero-content hero-slide-left" id="home-hero-inner">
           <span class="pill gold" style="margin-bottom:12px;">FEATURED</span>
           <h1 class="home-hero-title" id="home-hero-title">Enterprise Risk Management</h1>
           <p class="home-hero-desc" id="home-hero-desc">Master the fundamentals of ERM, ORM, and PRMIA standards to safeguard modern organizations.</p>
           <div style="display:flex; gap:12px; max-width:400px;">
-            <button class="primary" onclick="loadBook('b4')">Read Now</button>
-            <button class="secondary" style="background:rgba(255,255,255,0.2); color:#fff; border:none; backdrop-filter:blur(8px);" onclick="loadBook('b4')">More Info</button>
+            <button class="primary" id="home-hero-btn" onclick="loadBook('b4')">Read Now</button>
+            <button class="secondary" id="home-hero-btn-info" style="background:rgba(255,255,255,0.2); color:#fff; border:none; backdrop-filter:blur(8px);" onclick="loadBook('b4')">More Info</button>
           </div>
         </div>
       </div>
@@ -357,15 +392,14 @@ button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{colo
     </div>
   </section>
 
-  <!-- SEARCH (Restyled perfectly to match image) -->
+  <!-- SEARCH (Restyled perfectly to match screenshot) -->
   <section class="screen search-screen-dark" id="s-search">
     <div class="scroll" style="padding-top:100px;">
       <div style="padding:0 24px 24px; text-align:right;"><h2 class="title-serif" style="color:#fff; font-size:32px;">Search</h2></div>
       
-      <!-- Styled like the screenshot -->
       <div class="search-box-dark">
+        <span class="search-icon-dark" style="transform: rotate(270deg);">🔍</span>
         <div class="search-input-wrapper">
-          <span class="search-icon-dark">🔍</span>
           <input placeholder="Search..." id="search-input" onkeyup="handleSearch(this.value)">
         </div>
       </div>
@@ -441,7 +475,7 @@ button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{colo
     </div>
   </section>
 
-  <!-- READER -->
+  <!-- READER & PAYWALL ANIMATION -->
   <section class="screen reader" id="s-reader">
     <div class="scroll" style="padding-top:100px;">
       <div style="text-align:center; margin-bottom:40px; padding:0 24px;"><h2 class="title-serif" id="rd-title" style="font-size:28px;">Title</h2><p id="rd-author" class="subtle">Author</p></div>
@@ -547,7 +581,7 @@ button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{colo
 </div>
 
 <script>
-// Mock DB expanded to support the user's specific context implicitly[cite: 1]
+// Database
 const bookDB = [
   { id:'b1', title:'Atomic Habits', author:'James Clear', rating:'4.8★', pages:'320', cover:'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80', syn:'No matter your goals, Atomic Habits offers a proven framework for improving--every day.',
     reviews: [{name: 'Aarav', stars: '★★★★★', text: 'Clear, practical, and easy to finish. Highly recommended.'}, {name: 'Neha', stars: '★★★★☆', text: 'Great framework for building habits over time.'}]
@@ -556,26 +590,28 @@ const bookDB = [
     reviews: [{name: 'John', stars: '★★★★★', text: 'Changed the way I approach my daily work schedule.'}]
   },
   { id:'b3', title:'Sapiens', author:'Yuval Noah Harari', rating:'4.9★', pages:'464', cover:'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80', syn:'A brief history of humankind.', reviews: []},
-  { id:'b4', title:'Enterprise Risk Management', author:'John Fraser', rating:'4.6★', pages:'512', cover:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80', syn:'An essential guide to ERM and PRMIA standards. A must-read for risk professionals managing organizational safeguards.', reviews: []},
+  { id:'b4', title:'Enterprise Risk Management', author:'John Fraser', rating:'4.6★', pages:'512', cover:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80', syn:'An essential guide to ERM and PRMIA standards. A must-read for risk professionals managing organizational safeguards.', reviews: []},
   { id:'b5', title:'HSE Incident Management', author:'Safety Council', rating:'4.5★', pages:'210', cover:'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=400&q=80', syn:'A detailed breakdown of procedures including HSE-012, hazard identification, and maintaining safe work environments.', reviews: []},
   { id:'b6', title:'Practical Risk Management', author:'Institute', rating:'4.8★', pages:'450', cover:'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80', syn:'Master the fundamentals of ORM and sustainable safety controls.', reviews: []},
-  { id:'b7', title:'The Midnight Library', author:'Matt Haig', rating:'4.6★', pages:'304', cover:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80', syn:'Between life and death there is a library.', reviews: []}
+  { id:'b7', title:'The Midnight Library', author:'Matt Haig', rating:'4.6★', pages:'304', cover:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1200&q=80', syn:'Between life and death there is a library.', reviews: []}
 ];
 
-// Dynamic Community Requests DB
 let communityRequests = [
   { id: 1, title: 'Shoe Dog by Phil Knight', votes: 182 },
   { id: 2, title: 'Thinking, Fast and Slow by Daniel Kahneman', votes: 147 },
   { id: 3, title: 'Project Hail Mary by Andy Weir', votes: 89 }
 ];
 
-// State
 let currentScreen = 's-splash';
 const historyStack = [];
 let activeBookId = null;
 let isLoggedIn = false;
 let pendingPayment = false;
 let wishlist = new Set();
+
+// Netflix Carousel Variables
+let heroInterval = null;
+let currentFeatureIndex = 0;
 
 // Nav
 function go(id, push=true){
@@ -586,7 +622,14 @@ function go(id, push=true){
   next.classList.add('active'); currentScreen = id;
 
   updateGlobalNav(id);
-  if (id === 's-home') renderHome();
+  
+  if (id === 's-home') {
+      renderHome();
+      startHeroCarousel();
+  } else {
+      clearInterval(heroInterval); // Stop animation if leaving home
+  }
+  
   if (id === 's-search') {
       const input = document.getElementById('search-input');
       input.value = "DEE"; // Mock the screenshot default
@@ -607,7 +650,7 @@ function updateGlobalNav(screenId) {
   
   ham.style.display = 'none'; backBtn.style.display = 'none'; heart.style.display = 'none'; pill.style.display = 'none'; setBtn.style.display = 'none';
 
-  const isDark = (screenId === 's-book-detail' || screenId === 's-search');
+  const isDark = (screenId === 's-book-detail' || screenId === 's-search' || screenId === 's-home');
   document.querySelectorAll('.nav-btn').forEach(b => {
     if(isDark) { b.style.background = 'rgba(255,255,255,0.1)'; b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.2)'; b.style.backdropFilter = 'blur(8px)'; }
     else { b.style.background = '#fff'; b.style.color = 'var(--text)'; b.style.borderColor = 'rgba(0,0,0,.1)'; b.style.backdropFilter = 'none'; }
@@ -616,7 +659,7 @@ function updateGlobalNav(screenId) {
   if (['s-splash', 's-welcome-social', 's-signup', 's-otp', 's-signout', 's-plans', 's-payment-annual', 's-payment-monthly', 's-payment-failed'].includes(screenId)) {
     // Hide
   } else if (screenId === 's-home') {
-    ham.style.display = 'flex'; pill.style.display = 'block';
+    ham.style.display = 'flex'; // hamburger over dark background
   } else if (screenId === 's-book-detail') {
     backBtn.style.display = 'flex'; heart.style.display = 'flex'; updateHeartIcon();
   } else if (screenId === 's-reader') {
@@ -626,7 +669,6 @@ function updateGlobalNav(screenId) {
   }
 }
 
-// Drawer & Overlays
 function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); document.getElementById('drawerBackdrop').classList.toggle('show'); }
 function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerBackdrop').classList.remove('show'); }
 function toggleReaderSettings() { document.getElementById('readerSettings').classList.toggle('show'); document.getElementById('drawerBackdrop').classList.toggle('show'); }
@@ -636,33 +678,52 @@ function loginGuest() {
   isLoggedIn = false; pendingPayment = false; 
   document.getElementById('profile-name').textContent = "Guest User";
   document.getElementById('profile-email').textContent = "Not signed in";
-  
-  // Update Hero for Guest
-  document.getElementById('home-hero-bg').style.backgroundImage = "url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=1200&q=80')";
-  document.getElementById('home-hero-title').textContent = "Atomic Habits";
-  document.getElementById('home-hero-desc').textContent = "An easy-to-read guide to habit formation.";
-  document.querySelector('.home-hero button').setAttribute('onclick', "loadBook('b1')");
-
+  currentFeatureIndex = 0; // Reset index for guest
   go('s-home'); showToast('Browsing in Sample Mode', 'gold'); 
 }
 function executeLogin() { 
   isLoggedIn = true; 
   document.getElementById('profile-name').textContent = "Sachin Kumar";
   document.getElementById('profile-email').textContent = "sachin@example.com";
-  
-  // Update Hero for specific logged-in user
-  document.getElementById('home-hero-bg').style.backgroundImage = "url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80')";
-  document.getElementById('home-hero-title').textContent = "Enterprise Risk Management";
-  document.getElementById('home-hero-desc').textContent = "Master the fundamentals of ERM, ORM, and PRMIA standards to safeguard modern organizations.";
-  document.querySelector('.home-hero button').setAttribute('onclick', "loadBook('b4')");
-
+  currentFeatureIndex = 0; // Reset index for user
   if(pendingPayment){ go('s-plans'); } else { go('s-home'); showToast('Signed In', 'success'); } 
 }
 function signOut() { isLoggedIn = false; wishlist.clear(); go('s-signout'); }
 function unlockFullBook() { if(!isLoggedIn) { pendingPayment = true; showToast('Please sign in to upgrade', 'gold'); go('s-signup'); } else { go('s-plans'); } }
 function processPayment() { isLoggedIn = true; pendingPayment = false; showToast('Payment Successful!', 'success'); go('s-home'); }
 
-// Rendering Books
+// Netflix-Style Carousel Logic
+function startHeroCarousel() {
+  clearInterval(heroInterval);
+  updateHeroContent(); // Show first immediately
+  heroInterval = setInterval(() => {
+    const features = isLoggedIn ? ['b4', 'b7', 'b3'] : ['b1', 'b2', 'b5'];
+    currentFeatureIndex = (currentFeatureIndex + 1) % features.length;
+    updateHeroContent();
+  }, 5000); // 5 seconds per slide
+}
+
+function updateHeroContent() {
+  if (currentScreen !== 's-home') return;
+  const features = isLoggedIn ? ['b4', 'b7', 'b3'] : ['b1', 'b2', 'b5'];
+  const b = bookDB.find(x => x.id === features[currentFeatureIndex]);
+  
+  const heroBg = document.getElementById('home-hero-bg');
+  const innerContent = document.getElementById('home-hero-inner');
+  
+  // Re-trigger slide animation for text
+  innerContent.classList.remove('hero-slide-left');
+  void innerContent.offsetWidth; // Force reflow
+  innerContent.classList.add('hero-slide-left');
+  
+  // Update Content
+  heroBg.style.backgroundImage = `url('${b.cover}')`;
+  document.getElementById('home-hero-title').textContent = b.title;
+  document.getElementById('home-hero-desc').textContent = b.syn;
+  document.getElementById('home-hero-btn').setAttribute('onclick', `loadBook('${b.id}')`);
+  document.getElementById('home-hero-btn-info').setAttribute('onclick', `loadBook('${b.id}')`);
+}
+
 function createCardHTML(b) {
   return `<div class="card" style="min-width:300px; padding:16px; display:flex; gap:16px; align-items:center; cursor:pointer; scroll-snap-align: start;" onclick="loadBook('${b.id}')">
             <div class="thumb sm book-cover" style="background-image:url('${b.cover}')"></div>
@@ -671,23 +732,25 @@ function createCardHTML(b) {
 }
 
 function renderHome() {
-  // Re-trigger animations
-  const hero = document.getElementById('home-hero-bg');
-  hero.classList.remove('anim-fade-up');
-  void hero.offsetWidth; // trigger reflow
-  hero.classList.add('anim-fade-up');
+  // Re-trigger bottom section animations
+  document.querySelectorAll('#s-home .section').forEach(sec => {
+    sec.classList.remove('anim-fade-up');
+    void sec.offsetWidth;
+    sec.classList.add('anim-fade-up');
+  });
 
   document.getElementById('row-continue').innerHTML = createCardHTML(bookDB[0]) + createCardHTML(bookDB[1]);
   document.getElementById('row-trending').innerHTML = createCardHTML(bookDB[2]) + createCardHTML(bookDB[6]);
   document.getElementById('row-business').innerHTML = createCardHTML(bookDB[3]) + createCardHTML(bookDB[4]) + createCardHTML(bookDB[5]);
 }
 
+// Search & Filtering
 function handleSearch(q) {
   q = q.toLowerCase();
   const results = bookDB.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
   let html = '';
   results.forEach(b => {
-    html += `<div class="list-item" onclick="loadBook('${b.id}')" style="background:#1e293b; border:none;">
+    html += `<div class="list-item" onclick="loadBook('${b.id}')" style="background:transparent; border:1px solid #334155;">
               <div class="thumb sm book-cover" style="background-image:url('${b.cover}')"></div>
               <div style="flex:1;"><h4 style="color:#fff; font-weight:800; font-size:18px;">${b.title}</h4><p style="color:#94a3b8;">${b.author}</p></div>
              </div>`;
@@ -724,12 +787,23 @@ function loadBook(id) {
   go('s-book-detail');
 }
 
+// Reader & Animation Paywall
 function renderReader() {
   const contentDiv = document.getElementById('reader-content'); const paywall = document.getElementById('paywall-section');
   const textHTML = `<p><span style="float:left;font-size:64px;font-weight:800;line-height:.85;color:var(--gold);margin:6px 10px 0 0;font-family:'Playfair Display',serif;">T</span>he ability to concentrate without distraction is becoming increasingly rare. Deep, meaningful work requires focused energy.</p><p>Small improvements, repeated daily, lead to massive transformations. What seems insignificant today compounds over years into remarkable achievement.</p><p>We must consciously design our environments to foster the habits we want to build, rather than relying solely on willpower.</p>`;
 
-  if (!isLoggedIn) { contentDiv.innerHTML = `<div class="paywall-blur">${textHTML.split('</p>')[0]}</p></div>`; paywall.style.display = 'block'; } 
-  else { contentDiv.innerHTML = textHTML + `<p><em>End of Chapter.</em></p>`; paywall.style.display = 'none'; }
+  if (!isLoggedIn) { 
+    contentDiv.innerHTML = `<div class="paywall-blur">${textHTML.split('</p>')[0]}</p></div>`; 
+    paywall.style.display = 'block'; 
+    // Re-trigger animation
+    const box = paywall.querySelector('.paywall-box');
+    box.style.animation = 'none';
+    void box.offsetWidth;
+    box.style.animation = 'popUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards';
+  } else { 
+    contentDiv.innerHTML = textHTML + `<p><em>End of Chapter.</em></p>`; 
+    paywall.style.display = 'none'; 
+  }
 }
 
 function toggleWishlist() {
@@ -741,12 +815,9 @@ function toggleWishlist() {
 function updateHeartIcon() {
   const btn = document.getElementById('btn-heart');
   if(wishlist.has(activeBookId)) { btn.style.color = 'var(--coral)'; btn.innerHTML = '♥'; } 
-  else { btn.style.color = '#fff'; btn.innerHTML = '♡'; }
+  else { btn.style.color = 'var(--text)'; btn.innerHTML = '♡'; }
 }
 
-// ----------------------------------------------------
-// DYNAMIC REVIEWS 
-// ----------------------------------------------------
 function renderReviewsScreen() {
   if(!activeBookId) return;
   const b = bookDB.find(x => x.id === activeBookId);
@@ -754,10 +825,7 @@ function renderReviewsScreen() {
   document.getElementById('rev-total').textContent = `Based on ${b.reviews.length > 0 ? (12403 + b.reviews.length).toLocaleString() : '12,403'} ratings`;
   
   const listContainer = document.getElementById('reviews-list');
-  if (b.reviews.length === 0) {
-    listContainer.innerHTML = '<p class="subtle" style="text-align:center;">No reviews yet. Be the first!</p>';
-    return;
-  }
+  if (b.reviews.length === 0) { listContainer.innerHTML = '<p class="subtle" style="text-align:center;">No reviews yet. Be the first!</p>'; return; }
   
   let html = '';
   b.reviews.forEach(r => {
@@ -770,31 +838,19 @@ function renderReviewsScreen() {
 }
 
 function submitReview() {
-  const input = document.getElementById('new-review-text');
-  const val = input.value.trim();
+  const input = document.getElementById('new-review-text'); const val = input.value.trim();
   if(!val) { showToast('Please enter a review', 'danger'); return; }
-  
   const b = bookDB.find(x => x.id === activeBookId);
   b.reviews.unshift({ name: isLoggedIn ? 'Sachin Kumar' : 'Guest User', stars: '★★★★★', text: val });
-  input.value = '';
-  showToast('Review posted successfully', 'success');
-  renderReviewsScreen();
-  // Update detail screen count
+  input.value = ''; showToast('Review posted successfully', 'success'); renderReviewsScreen();
   document.getElementById('det-review-count').textContent = (12403 + b.reviews.length) > 1000 ? ((12403 + b.reviews.length)/1000).toFixed(1)+'k' : b.reviews.length;
 }
 
-// ----------------------------------------------------
-// DYNAMIC COMMUNITY REQUESTS
-// ----------------------------------------------------
 function renderCommunity() {
-  let html = '';
-  const sortedReqs = [...communityRequests].sort((a,b) => b.votes - a.votes);
+  let html = ''; const sortedReqs = [...communityRequests].sort((a,b) => b.votes - a.votes);
   sortedReqs.forEach(req => {
     html += `<div class="list-item" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
-              <div style="flex:1;">
-                <h4 style="font-weight:800; font-size:16px;">${req.title}</h4>
-                <p class="subtle" style="font-size:13px;">Requested by <strong style="color:var(--text);">${req.votes}</strong> users</p>
-              </div>
+              <div style="flex:1;"><h4 style="font-weight:800; font-size:16px;">${req.title}</h4><p class="subtle" style="font-size:13px;">Requested by <strong style="color:var(--text);">${req.votes}</strong> users</p></div>
               <button class="pill success" onclick="upvoteRequest(${req.id})" style="cursor:pointer; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3);">↑ Vote</button>
              </div>`;
   });
@@ -802,26 +858,13 @@ function renderCommunity() {
 }
 
 function submitBookRequest() {
-  const input = document.getElementById('new-request-input');
-  const val = input.value.trim();
+  const input = document.getElementById('new-request-input'); const val = input.value.trim();
   if(!val) { showToast('Please enter a book name', 'danger'); return; }
-  
-  communityRequests.push({ id: Date.now(), title: val, votes: 1 });
-  input.value = '';
-  showToast('Book requested successfully!', 'success');
-  renderCommunity();
+  communityRequests.push({ id: Date.now(), title: val, votes: 1 }); input.value = '';
+  showToast('Book requested successfully!', 'success'); renderCommunity();
 }
+function upvoteRequest(id) { const req = communityRequests.find(r => r.id === id); if(req) { req.votes++; renderCommunity(); showToast('Vote Added', 'success'); } }
 
-function upvoteRequest(id) {
-  const req = communityRequests.find(r => r.id === id);
-  if(req) { 
-    req.votes++; 
-    renderCommunity(); 
-    showToast('Vote Added', 'success'); 
-  }
-}
-
-// Reader Settings
 function setReaderTheme(mode, el) {
   const reader = document.getElementById('s-reader');
   reader.style.setProperty('--reader', mode === 'dark' ? '#111827' : mode === 'sepia' ? '#fdf6e3' : '#fffaf2');
@@ -834,13 +877,12 @@ function setFontSize(size, el) {
   document.querySelectorAll('.settings-btn').forEach(b => { if(b.parentElement.previousElementSibling.textContent.includes('Size')) b.classList.remove('active') });
   el.classList.add('active');
 }
-
 function showToast(msg, type=''){
   const root = document.getElementById('toast'); const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
   root.appendChild(t); requestAnimationFrame(()=> t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=> t.remove(), 260); }, 2200);
 }
 
-// Ensure search pills toggle visual state
+// Search UI Filter Toggles
 document.querySelectorAll('.filter-bar-dark .chip').forEach(chip => {
     chip.addEventListener('click', function() {
         document.querySelectorAll('.filter-bar-dark .chip').forEach(c => c.classList.remove('active'));
