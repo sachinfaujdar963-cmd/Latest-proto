@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PageTurn — High-Fidelity Prototype v11 (Complete)</title>
+<title>PageTurn — High-Fidelity Prototype v13</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#faf8f5; --surface:#ffffff; --border:#e2dcd0; --text:#0f172a; --text2:#334155; --text3:#64748b;
   --gold:#d97706; --coral:#c25e3e; --success:#10b981; --danger:#ef4444;
-  --reader:#fffaf2; --readerText:#1e293b; --dark-bg: #111827; --dark-surface: #1f2937;
+  --reader:#fffaf2; --readerText:#1e293b; --dark-bg: #0b1121; --dark-surface: #1e293b;
   scroll-behavior:smooth;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html, body{width:100%;height:100%;background:var(--bg);font-family:'Inter',sans-serif;overflow:hidden;color:var(--text);font-size:16px;}
-button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit;text-decoration:none}
 .frame{width:100vw; height:100vh; display:flex; position:relative; overflow:hidden;}
 .main-panel{flex:1; min-width:0; position:relative; background:var(--bg);}
 
@@ -36,7 +36,7 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
 .screen.exit-left{opacity:0;transform:translateX(-20px)}
 .scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
 .scroll::-webkit-scrollbar{display:none}
-.topbar{padding:100px 24px 24px; display:flex; align-items:center;}
+.topbar{padding:100px 24px 24px; display:flex; align-items:center; justify-content:space-between;}
 
 /* Typography & Base */
 .title-serif{font-family:'Playfair Display',serif;color:var(--text);font-weight:800;}
@@ -51,6 +51,26 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
 .input{width:100%;min-height:56px;padding:16px;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:12px;font-size:16px;}
 .input:focus{border-color:var(--coral);}
 .label{display:block;margin-bottom:8px;font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;}
+
+/* Home Hero Background & Cover (NEW) */
+.home-hero{
+  position:relative; width:100%; height:480px; background-size:cover; background-position:center;
+  display:flex; flex-direction:column; justify-content:flex-end; padding:40px 24px; color:#fff;
+  transition: background-image 0.5s ease;
+}
+.home-hero::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.9) 80%, var(--bg) 100%);
+  pointer-events:none;
+}
+.home-hero-content{position:relative; z-index:10;}
+.home-hero-title{font-family:'Playfair Display',serif; font-size:48px; font-weight:900; line-height:1.1; margin-bottom:12px; text-shadow:0 4px 12px rgba(0,0,0,0.5);}
+.home-hero-desc{font-size:16px; line-height:1.5; color:rgba(255,255,255,0.85); max-width:600px; margin-bottom:24px; text-shadow:0 2px 8px rgba(0,0,0,0.5);}
+
+/* Animations */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+.anim-fade-up { opacity:0; animation: fadeInUp 0.6s ease forwards; }
+.d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.2s; } .d-3 { animation-delay: 0.3s; }
 
 /* Layouts */
 .section{margin:0 24px 40px;}
@@ -85,12 +105,29 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
 .chip{border:none;border-radius:999px;padding:10px 20px;background:var(--surface);color:var(--text2);border:1px solid var(--border);font-size:14px;font-weight:700;cursor:pointer;}
 .chip.active{background:var(--coral);color:#fff;border-color:var(--coral);}
 
-/* Overlay Settings (Restored v7) */
+/* Overlay Settings */
 .overlay-sheet{position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-radius:32px 32px 0 0; padding:24px; box-shadow:0 -10px 40px rgba(0,0,0,.1); z-index:90; transform:translateY(100%); transition:transform 0.3s; display:flex; flex-direction:column; max-height:80vh;}
 .overlay-sheet.show{transform:translateY(0);}
 .settings-row{display:flex; gap:12px; margin-bottom:24px;}
 .settings-btn{flex:1; padding:16px; border-radius:12px; border:1px solid var(--border); background:var(--bg); font-weight:700; cursor:pointer;}
 .settings-btn.active{border-color:var(--gold); color:var(--gold); background:#fff;}
+
+/* Match Search Screenshot Styles */
+.search-screen-dark { background: var(--dark-bg); color: #fff; }
+.search-box-dark {
+  display: flex; align-items: center; gap: 8px; margin: 0 24px 16px; 
+  padding: 0; background: transparent; border: none;
+}
+.search-input-wrapper {
+  flex: 1; display: flex; align-items: center; background: #ffffff; border-radius: 4px; padding: 10px 14px;
+}
+.search-input-wrapper input {
+  border: none; background: transparent; color: #0f172a; font-size: 16px; font-weight: 500; width: 100%; outline: none; margin-left: 8px;
+}
+.search-icon-dark { font-size: 20px; line-height: 1; }
+.filter-bar-dark { padding: 0 24px 24px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+.filter-bar-dark .chip { background: #ffffff; color: #0f172a; border: none; font-weight: 800; border-radius: 20px; padding: 10px 18px; box-shadow: none;}
+.filter-bar-dark .chip.active { background: #c25e3e; color: #ffffff; }
 </style>
 </head>
 <body>
@@ -99,7 +136,7 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
   <div class="nav-left">
     <button class="nav-btn" id="btn-hamburger" onclick="toggleDrawer()">☰</button>
     <button class="nav-btn" id="btn-back" onclick="back()" style="display:none;">←</button>
-    <div class="top-desktop-pill" id="nav-pill">Library</div>
+    <div class="top-desktop-pill" id="nav-pill" style="display:none;">Library</div>
   </div>
   <div class="nav-right">
     <button class="nav-btn" id="btn-heart" onclick="toggleWishlist()" style="display:none; color:var(--text);">♡</button>
@@ -118,12 +155,12 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
     <button class="drawer-nav-item" onclick="go('s-search'); closeDrawer()">🔍 Search</button>
     <button class="drawer-nav-item" onclick="go('s-wishlist'); closeDrawer()">♥ Wishlist</button>
     <button class="drawer-nav-item" onclick="go('s-downloads'); closeDrawer()">⬇ Downloads</button>
-    <button class="drawer-nav-item" onclick="go('s-community'); closeDrawer()">💬 Community</button>
+    <button class="drawer-nav-item" onclick="go('s-community'); closeDrawer()">💬 Community Requests</button>
     <button class="drawer-nav-item" onclick="go('s-profile'); closeDrawer()">⚙ Profile & Settings</button>
   </div>
 </aside>
 
-<!-- Restored Reader Settings Overlay -->
+<!-- Reader Settings Overlay -->
 <div class="overlay-sheet" id="readerSettings">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
     <h3 class="title-serif" style="font-size:24px;">Reader Settings</h3>
@@ -162,15 +199,14 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
   <section class="screen" id="s-welcome-social">
     <div class="scroll">
       <div style="padding:120px 24px 40px; max-width:800px; margin:0 auto;">
-        <span class="pill success" style="margin-bottom:24px;">JOIN 2,000,000+ READERS</span>
+        <span class="pill success" style="margin-bottom:24px; background:#d1fae5; color:#047857; border:none;">JOIN 2,000,000+ READERS</span>
         <h1 class="title-serif" style="font-size:48px; line-height:1.1; margin-bottom:16px;">Find your next book.<br>Keep reading every day.</h1>
-        <p class="subtle" style="font-size:18px; margin-bottom:48px;">Unlimited access to thousands of audiobooks, ebooks, and more. Netflix for books.</p>
-        
+        <p class="subtle" style="font-size:18px; margin-bottom:48px;">Unlimited access to thousands of audiobooks, ebooks, and more.</p>
         <div style="display:flex; gap:16px; margin-bottom:48px;">
           <div class="card" style="flex:1; padding:24px; text-align:center;"><strong style="display:block; font-size:24px;">50K+</strong><span class="label">Books</span></div>
           <div class="card" style="flex:1; padding:24px; text-align:center;"><strong style="display:block; font-size:24px;">4.8★</strong><span class="label">Rating</span></div>
         </div>
-        <button class="primary" onclick="go('s-signup')">Continue with Email</button>
+        <button class="primary" onclick="go('s-signup')">Sign in with Email</button>
         <div style="height:16px;"></div>
         <button class="secondary" onclick="loginGuest()">Browse as Guest (Sample Mode)</button>
       </div>
@@ -203,7 +239,7 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
     </div>
   </section>
 
-  <!-- OTP (Restored) -->
+  <!-- OTP -->
   <section class="screen" id="s-otp">
     <div class="scroll">
       <div style="padding:120px 24px; max-width:600px; margin:0 auto; text-align:center;">
@@ -277,7 +313,7 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
     </div>
   </section>
 
-  <!-- PAYMENT FAILED (Restored) -->
+  <!-- PAYMENT FAILED -->
   <section class="screen" id="s-payment-failed">
     <div class="scroll">
       <div style="padding:120px 24px; max-width:600px; margin:0 auto; text-align:center;">
@@ -291,24 +327,59 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
     </div>
   </section>
 
-  <!-- HOME (Netflix Rows) -->
+  <!-- HOME w/ Animated Hero Cover -->
   <section class="screen" id="s-home">
-    <div class="scroll" style="padding-top:100px;">
-      <div class="section" id="home-greeting"></div>
-      <div class="section"><div class="section-head"><h3 class="title-serif">Continue Reading</h3></div><div class="feature-row" id="row-continue"></div></div>
-      <div class="section"><div class="section-head"><h3 class="title-serif">Trending Now 🔥</h3><button class="link" onclick="go('s-search')">Explore</button></div><div class="feature-row" id="row-trending"></div></div>
-      <div class="section"><div class="section-head"><h3 class="title-serif">Business & Strategy</h3><button class="link" onclick="go('s-search')">Explore</button></div><div class="feature-row" id="row-business"></div></div>
-      <div class="footer"><p>PageTurn Library &copy; 2026</p></div>
+    <div class="scroll">
+      <div class="home-hero anim-fade-up" id="home-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80');">
+        <div class="home-hero-content">
+          <span class="pill gold" style="margin-bottom:12px;">FEATURED</span>
+          <h1 class="home-hero-title" id="home-hero-title">Enterprise Risk Management</h1>
+          <p class="home-hero-desc" id="home-hero-desc">Master the fundamentals of ERM, ORM, and PRMIA standards to safeguard modern organizations.</p>
+          <div style="display:flex; gap:12px; max-width:400px;">
+            <button class="primary" onclick="loadBook('b4')">Read Now</button>
+            <button class="secondary" style="background:rgba(255,255,255,0.2); color:#fff; border:none; backdrop-filter:blur(8px);" onclick="loadBook('b4')">More Info</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section anim-fade-up d-1" style="margin-top:40px;">
+        <div class="section-head"><h3 class="title-serif">Continue Reading</h3></div>
+        <div class="feature-row" id="row-continue"></div>
+      </div>
+      <div class="section anim-fade-up d-2">
+        <div class="section-head"><h3 class="title-serif">Trending Now 🔥</h3><button class="link" onclick="go('s-search')">Explore</button></div>
+        <div class="feature-row" id="row-trending"></div>
+      </div>
+      <div class="section anim-fade-up d-3">
+        <div class="section-head"><h3 class="title-serif">Business & Strategy</h3><button class="link" onclick="go('s-search')">Explore</button></div>
+        <div class="feature-row" id="row-business"></div>
+      </div>
     </div>
   </section>
 
-  <!-- SEARCH -->
-  <section class="screen" id="s-search">
-    <div class="scroll" style="background:var(--dark-bg); color:#f8fafc; padding-top:100px;">
-      <div style="padding:0 24px 24px; text-align:center;"><h2 class="title-serif" style="color:#fff; font-size:32px;">Search</h2></div>
-      <div class="search-box" style="border-color:var(--gold);"><span style="font-size:20px;">🔍</span><input placeholder="Search books, authors..." id="search-input" style="color:var(--text);" onkeyup="handleSearch(this.value)"></div>
-      <div class="filter-bar"><button class="chip active">Popular</button><button class="chip">Genres</button><button class="chip">Author</button></div>
-      <div class="section" style="margin-top:24px;"><h3 class="title-serif" style="font-size:20px; color:#fff; margin-bottom:16px;">Browse All</h3><div id="search-results" style="display:flex; flex-direction:column; gap:12px;"></div></div>
+  <!-- SEARCH (Restyled perfectly to match image) -->
+  <section class="screen search-screen-dark" id="s-search">
+    <div class="scroll" style="padding-top:100px;">
+      <div style="padding:0 24px 24px; text-align:right;"><h2 class="title-serif" style="color:#fff; font-size:32px;">Search</h2></div>
+      
+      <!-- Styled like the screenshot -->
+      <div class="search-box-dark">
+        <div class="search-input-wrapper">
+          <span class="search-icon-dark">🔍</span>
+          <input placeholder="Search..." id="search-input" onkeyup="handleSearch(this.value)">
+        </div>
+      </div>
+      
+      <div class="filter-bar-dark">
+        <button class="chip active">Popular</button>
+        <button class="chip">Genres</button>
+        <button class="chip">Author</button>
+      </div>
+
+      <div class="section" style="margin-top:24px;">
+        <h3 class="title-serif" style="font-size:20px; color:#fff; margin-bottom:16px;">Browse All</h3>
+        <div id="search-results" style="display:flex; flex-direction:column; gap:12px;"></div>
+      </div>
     </div>
   </section>
 
@@ -327,13 +398,13 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
           <div style="width:1px; height:40px; background:var(--border);"></div>
           <div style="text-align:center; flex:1;"><span class="label" style="font-size:11px; margin-bottom:4px;">Pages</span><strong style="font-size:22px; font-weight:800;" id="det-pages">320</strong></div>
           <div style="width:1px; height:40px; background:var(--border);"></div>
-          <div style="text-align:center; flex:1; cursor:pointer;" onclick="go('s-reviews')"><span class="label" style="font-size:11px; margin-bottom:4px;">Reviews</span><strong style="font-size:22px; font-weight:800;">12.4k</strong></div>
+          <div style="text-align:center; flex:1; cursor:pointer;" onclick="go('s-reviews')"><span class="label" style="font-size:11px; margin-bottom:4px;">Reviews</span><strong style="font-size:22px; font-weight:800;" id="det-review-count">12.4k</strong></div>
         </div>
         <div style="margin-top:32px;"><button class="primary" onclick="go('s-reader')">Read Now</button></div>
         <div class="card" style="margin-top:32px; background:var(--dark-surface); padding:24px; border:none; color:#fff;">
           <h3 class="title-serif" style="font-size:24px; margin-bottom:16px; color:#fff;">Synopsis</h3>
           <p id="det-synopsis" style="color:#cbd5e1; font-size:15px; line-height:1.7; margin-bottom:24px;"></p>
-          <button class="secondary" style="background:#fff; color:#0f172a; margin-bottom:12px; border:none;" onclick="go('s-reviews')">View Reviews</button>
+          <button class="secondary" style="background:#fff; color:#0f172a; margin-bottom:12px; border:none;" onclick="go('s-reviews')">View / Write Reviews</button>
         </div>
         <div class="section" style="margin:40px -24px 0 -24px; padding:0 24px;">
           <h3 class="title-serif" style="font-size:24px; margin-bottom:20px;">You might also like</h3>
@@ -343,19 +414,28 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
     </div>
   </section>
 
-  <!-- REVIEWS -->
+  <!-- REVIEWS (Dynamic) -->
   <section class="screen" id="s-reviews">
     <div class="scroll" style="padding-top:100px;">
       <div class="section">
-        <h2 class="title-serif" style="font-size:32px; margin-bottom:24px;">Reviews</h2>
-        <div class="card" style="padding:24px; text-align:center; margin-bottom:24px;">
-          <strong style="font-size:48px; font-weight:800; display:block;">4.8</strong>
-          <div style="color:var(--gold); font-size:24px; margin-bottom:8px;">★★★★★</div>
-          <span class="subtle">Based on 12,403 ratings</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h2 class="title-serif" style="font-size:32px;">Reviews</h2>
         </div>
-        <button class="primary" style="margin-bottom:32px;" onclick="showToast('Review submitted','success')">Write a Review</button>
-        <div style="display:flex; flex-direction:column; gap:16px;">
-          <div class="card" style="padding:20px;"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><strong>Aarav</strong><span style="color:var(--gold);">★★★★★</span></div><p class="subtle">Clear, practical, and easy to finish.</p></div>
+        
+        <div class="card" style="padding:24px; text-align:center; margin-bottom:24px;">
+          <strong style="font-size:48px; font-weight:800; display:block;" id="rev-avg">4.8</strong>
+          <div style="color:var(--gold); font-size:24px; margin-bottom:8px;">★★★★★</div>
+          <span class="subtle" id="rev-total">Based on ratings</span>
+        </div>
+
+        <div class="card" style="padding:20px; margin-bottom:32px;">
+          <h3 class="title-serif" style="font-size:20px; margin-bottom:12px;">Write a Review</h3>
+          <textarea id="new-review-text" class="input" style="min-height:100px; resize:vertical; margin-bottom:12px; font-family:inherit;" placeholder="What did you think of this book?"></textarea>
+          <button class="primary" onclick="submitReview()">Post Review</button>
+        </div>
+
+        <div id="reviews-list" style="display:flex; flex-direction:column; gap:16px;">
+            <!-- Populated via JS -->
         </div>
       </div>
     </div>
@@ -378,7 +458,7 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
     </div>
   </section>
 
-  <!-- DOWNLOADS & OFFLINE (Restored) -->
+  <!-- DOWNLOADS & OFFLINE -->
   <section class="screen" id="s-downloads">
     <div class="scroll" style="padding-top:100px;">
       <div class="section">
@@ -389,8 +469,8 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
         </div>
         <div id="downloads-container" style="display:flex; flex-direction:column; gap:16px;">
           <div class="list-item" onclick="go('s-offline')">
-            <div class="thumb sm book-cover" style="background-image:url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80')"></div>
-            <div style="flex:1;"><h4 style="font-weight:800; font-size:16px;">Atomic Habits</h4><p class="subtle" style="font-size:13px;">Downloaded • 100%</p></div>
+            <div class="thumb sm book-cover" style="background-image:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80')"></div>
+            <div style="flex:1;"><h4 style="font-weight:800; font-size:16px;">Enterprise Risk</h4><p class="subtle" style="font-size:13px;">Downloaded • 100%</p></div>
             <span class="pill success" style="background:transparent; border-color:var(--success);">Ready</span>
           </div>
         </div>
@@ -404,7 +484,7 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
         <div style="font-size:48px; margin-bottom:16px;">📶</div>
         <h1 class="title-serif" style="font-size:36px; margin-bottom:16px;">No Internet</h1>
         <p class="subtle" style="margin-bottom:32px;">You are currently offline. You can still read your downloaded books.</p>
-        <button class="primary" onclick="go('s-reader')">Continue Reading</button>
+        <button class="primary" onclick="loadBook('b4')">Continue Reading</button>
       </div>
     </div>
   </section>
@@ -416,30 +496,38 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
     </div>
   </section>
 
-  <!-- COMMUNITY (Restored) -->
+  <!-- COMMUNITY REQUESTS (Dynamic) -->
   <section class="screen" id="s-community">
     <div class="scroll" style="padding-top:100px;">
       <div class="section">
-        <h2 class="title-serif" style="font-size:36px; margin-bottom:24px;">Community Requests</h2>
-        <div class="list-item">
-          <div style="flex:1;"><h4 style="font-weight:800; font-size:16px;">Shoe Dog</h4><p class="subtle" style="font-size:13px;">Requested by 182 users</p></div>
-          <button class="pill success" onclick="showToast('Vote Added','success')">↑ Vote</button>
+        <h2 class="title-serif" style="font-size:36px; margin-bottom:16px;">Community Requests</h2>
+        <p class="subtle" style="margin-bottom:24px;">Can't find a book in our library? Request it below or vote on existing requests.</p>
+        
+        <div class="card" style="padding:20px; margin-bottom:32px;">
+          <label class="label">Request a New Book</label>
+          <input class="input" id="new-request-input" placeholder="Enter book title and author...">
+          <button class="primary" style="margin-top:16px;" onclick="submitBookRequest()">Submit Request</button>
+        </div>
+
+        <h3 class="title-serif" style="font-size:24px; margin-bottom:16px;">Current Requests</h3>
+        <div id="community-list" style="display:flex; flex-direction:column; gap:12px;">
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PROFILE & EDIT PROFILE (Restored) -->
+  <!-- PROFILE & EDIT PROFILE -->
   <section class="screen" id="s-profile">
     <div class="scroll" style="padding-top:100px;">
       <div class="section" style="text-align:center">
         <div style="width:100px; height:100px; border-radius:32px; background:var(--coral); color:#fff; display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:800; margin:0 auto 16px;">S</div>
-        <h1 class="title-serif" style="font-size:32px; margin-bottom:4px;">Sachin Kumar</h1>
-        <p class="subtle" style="margin-bottom:16px;">sachin@example.com</p>
+        <h1 class="title-serif" style="font-size:32px; margin-bottom:4px;" id="profile-name">Sachin Kumar</h1>
+        <p class="subtle" style="margin-bottom:16px;" id="profile-email">sachin@example.com</p>
       </div>
       <div class="section" style="display:flex; flex-direction:column; gap:12px;">
         <button class="secondary" onclick="go('s-edit-profile')">Edit Profile</button>
-        <button class="secondary" onclick="go('s-community')">Community Voting</button>
+        <button class="secondary" onclick="go('s-community')">Request Books</button>
         <button class="secondary" onclick="signOut()" style="color:var(--danger); border-color:var(--danger);">Sign Out</button>
       </div>
     </div>
@@ -459,13 +547,26 @@ button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit
 </div>
 
 <script>
-// Mock DB
+// Mock DB expanded to support the user's specific context implicitly[cite: 1]
 const bookDB = [
-  { id:'b1', title:'Atomic Habits', author:'James Clear', rating:'4.8★', pages:'320', cover:'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80', syn:'No matter your goals, Atomic Habits offers a proven framework for improving--every day.'},
-  { id:'b2', title:'Deep Work', author:'Cal Newport', rating:'4.7★', pages:'296', cover:'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=80', syn:'Deep work is the ability to focus without distraction on a cognitively demanding task.'},
-  { id:'b3', title:'Sapiens', author:'Yuval Noah Harari', rating:'4.9★', pages:'464', cover:'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80', syn:'A brief history of humankind.'},
-  { id:'b4', title:'Enterprise Risk', author:'John Fraser', rating:'4.6★', pages:'512', cover:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80', syn:'An essential guide to ERM.'},
-  { id:'b5', title:'The Midnight Library', author:'Matt Haig', rating:'4.6★', pages:'304', cover:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80', syn:'Between life and death there is a library.'}
+  { id:'b1', title:'Atomic Habits', author:'James Clear', rating:'4.8★', pages:'320', cover:'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80', syn:'No matter your goals, Atomic Habits offers a proven framework for improving--every day.',
+    reviews: [{name: 'Aarav', stars: '★★★★★', text: 'Clear, practical, and easy to finish. Highly recommended.'}, {name: 'Neha', stars: '★★★★☆', text: 'Great framework for building habits over time.'}]
+  },
+  { id:'b2', title:'Deep Work', author:'Cal Newport', rating:'4.7★', pages:'296', cover:'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=80', syn:'Deep work is the ability to focus without distraction on a cognitively demanding task.',
+    reviews: [{name: 'John', stars: '★★★★★', text: 'Changed the way I approach my daily work schedule.'}]
+  },
+  { id:'b3', title:'Sapiens', author:'Yuval Noah Harari', rating:'4.9★', pages:'464', cover:'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80', syn:'A brief history of humankind.', reviews: []},
+  { id:'b4', title:'Enterprise Risk Management', author:'John Fraser', rating:'4.6★', pages:'512', cover:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80', syn:'An essential guide to ERM and PRMIA standards. A must-read for risk professionals managing organizational safeguards.', reviews: []},
+  { id:'b5', title:'HSE Incident Management', author:'Safety Council', rating:'4.5★', pages:'210', cover:'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=400&q=80', syn:'A detailed breakdown of procedures including HSE-012, hazard identification, and maintaining safe work environments.', reviews: []},
+  { id:'b6', title:'Practical Risk Management', author:'Institute', rating:'4.8★', pages:'450', cover:'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80', syn:'Master the fundamentals of ORM and sustainable safety controls.', reviews: []},
+  { id:'b7', title:'The Midnight Library', author:'Matt Haig', rating:'4.6★', pages:'304', cover:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80', syn:'Between life and death there is a library.', reviews: []}
+];
+
+// Dynamic Community Requests DB
+let communityRequests = [
+  { id: 1, title: 'Shoe Dog by Phil Knight', votes: 182 },
+  { id: 2, title: 'Thinking, Fast and Slow by Daniel Kahneman', votes: 147 },
+  { id: 3, title: 'Project Hail Mary by Andy Weir', votes: 89 }
 ];
 
 // State
@@ -486,9 +587,15 @@ function go(id, push=true){
 
   updateGlobalNav(id);
   if (id === 's-home') renderHome();
-  if (id === 's-search') handleSearch(document.getElementById('search-input').value);
+  if (id === 's-search') {
+      const input = document.getElementById('search-input');
+      input.value = "DEE"; // Mock the screenshot default
+      handleSearch(input.value);
+  }
   if (id === 's-wishlist') renderWishlist();
   if (id === 's-reader') renderReader();
+  if (id === 's-community') renderCommunity();
+  if (id === 's-reviews') renderReviewsScreen();
 }
 
 function back(){ const id = historyStack.pop() || 's-home'; go(id, false); }
@@ -525,13 +632,37 @@ function closeDrawer() { document.getElementById('drawer').classList.remove('ope
 function toggleReaderSettings() { document.getElementById('readerSettings').classList.toggle('show'); document.getElementById('drawerBackdrop').classList.toggle('show'); }
 
 // Auth Flow
-function loginGuest() { isLoggedIn = false; pendingPayment = false; go('s-home'); showToast('Browsing in Sample Mode', 'gold'); }
-function executeLogin() { isLoggedIn = true; if(pendingPayment){ go('s-plans'); } else { go('s-home'); showToast('Signed In', 'success'); } }
+function loginGuest() { 
+  isLoggedIn = false; pendingPayment = false; 
+  document.getElementById('profile-name').textContent = "Guest User";
+  document.getElementById('profile-email').textContent = "Not signed in";
+  
+  // Update Hero for Guest
+  document.getElementById('home-hero-bg').style.backgroundImage = "url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=1200&q=80')";
+  document.getElementById('home-hero-title').textContent = "Atomic Habits";
+  document.getElementById('home-hero-desc').textContent = "An easy-to-read guide to habit formation.";
+  document.querySelector('.home-hero button').setAttribute('onclick', "loadBook('b1')");
+
+  go('s-home'); showToast('Browsing in Sample Mode', 'gold'); 
+}
+function executeLogin() { 
+  isLoggedIn = true; 
+  document.getElementById('profile-name').textContent = "Sachin Kumar";
+  document.getElementById('profile-email').textContent = "sachin@example.com";
+  
+  // Update Hero for specific logged-in user
+  document.getElementById('home-hero-bg').style.backgroundImage = "url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80')";
+  document.getElementById('home-hero-title').textContent = "Enterprise Risk Management";
+  document.getElementById('home-hero-desc').textContent = "Master the fundamentals of ERM, ORM, and PRMIA standards to safeguard modern organizations.";
+  document.querySelector('.home-hero button').setAttribute('onclick', "loadBook('b4')");
+
+  if(pendingPayment){ go('s-plans'); } else { go('s-home'); showToast('Signed In', 'success'); } 
+}
 function signOut() { isLoggedIn = false; wishlist.clear(); go('s-signout'); }
 function unlockFullBook() { if(!isLoggedIn) { pendingPayment = true; showToast('Please sign in to upgrade', 'gold'); go('s-signup'); } else { go('s-plans'); } }
 function processPayment() { isLoggedIn = true; pendingPayment = false; showToast('Payment Successful!', 'success'); go('s-home'); }
 
-// Rendering
+// Rendering Books
 function createCardHTML(b) {
   return `<div class="card" style="min-width:300px; padding:16px; display:flex; gap:16px; align-items:center; cursor:pointer; scroll-snap-align: start;" onclick="loadBook('${b.id}')">
             <div class="thumb sm book-cover" style="background-image:url('${b.cover}')"></div>
@@ -540,10 +671,15 @@ function createCardHTML(b) {
 }
 
 function renderHome() {
-  document.getElementById('home-greeting').innerHTML = isLoggedIn ? `<h2 class="title-serif" style="font-size:36px; font-weight:800; margin-bottom:8px;">Good morning, Sachin</h2>` : `<h2 class="title-serif" style="font-size:36px; font-weight:800; margin-bottom:8px;">Welcome, Guest</h2><p class="subtle">Viewing in Sample Mode.</p>`;
+  // Re-trigger animations
+  const hero = document.getElementById('home-hero-bg');
+  hero.classList.remove('anim-fade-up');
+  void hero.offsetWidth; // trigger reflow
+  hero.classList.add('anim-fade-up');
+
   document.getElementById('row-continue').innerHTML = createCardHTML(bookDB[0]) + createCardHTML(bookDB[1]);
-  document.getElementById('row-trending').innerHTML = createCardHTML(bookDB[2]) + createCardHTML(bookDB[4]);
-  document.getElementById('row-business').innerHTML = createCardHTML(bookDB[3]) + createCardHTML(bookDB[1]);
+  document.getElementById('row-trending').innerHTML = createCardHTML(bookDB[2]) + createCardHTML(bookDB[6]);
+  document.getElementById('row-business').innerHTML = createCardHTML(bookDB[3]) + createCardHTML(bookDB[4]) + createCardHTML(bookDB[5]);
 }
 
 function handleSearch(q) {
@@ -556,7 +692,7 @@ function handleSearch(q) {
               <div style="flex:1;"><h4 style="color:#fff; font-weight:800; font-size:18px;">${b.title}</h4><p style="color:#94a3b8;">${b.author}</p></div>
              </div>`;
   });
-  document.getElementById('search-results').innerHTML = html || '<p style="color:#94a3b8;">No matches found.</p>';
+  document.getElementById('search-results').innerHTML = html || '<p style="color:#94a3b8;">No matches found. Check Community to request it.</p>';
 }
 
 function renderWishlist() {
@@ -578,6 +714,7 @@ function loadBook(id) {
   document.getElementById('det-title').textContent = b.title; document.getElementById('det-author').textContent = b.author;
   document.getElementById('det-rating').textContent = b.rating; document.getElementById('det-pages').textContent = b.pages;
   document.getElementById('det-synopsis').textContent = b.syn;
+  document.getElementById('det-review-count').textContent = b.reviews.length > 0 ? b.reviews.length : '0';
   
   let relatedHtml = '';
   bookDB.filter(x => x.id !== id).slice(0,3).forEach(rel => { relatedHtml += `<div class="thumb lg book-cover" style="background-image:url('${rel.cover}')" onclick="loadBook('${rel.id}')"><div class="book-author">${rel.author}</div><div class="book-title">${rel.title}</div></div>`; });
@@ -604,10 +741,87 @@ function toggleWishlist() {
 function updateHeartIcon() {
   const btn = document.getElementById('btn-heart');
   if(wishlist.has(activeBookId)) { btn.style.color = 'var(--coral)'; btn.innerHTML = '♥'; } 
-  else { btn.style.color = 'var(--text)'; btn.innerHTML = '♡'; }
+  else { btn.style.color = '#fff'; btn.innerHTML = '♡'; }
 }
 
-// Reader Settings (Restored)
+// ----------------------------------------------------
+// DYNAMIC REVIEWS 
+// ----------------------------------------------------
+function renderReviewsScreen() {
+  if(!activeBookId) return;
+  const b = bookDB.find(x => x.id === activeBookId);
+  document.getElementById('rev-avg').textContent = b.rating.replace('★','');
+  document.getElementById('rev-total').textContent = `Based on ${b.reviews.length > 0 ? (12403 + b.reviews.length).toLocaleString() : '12,403'} ratings`;
+  
+  const listContainer = document.getElementById('reviews-list');
+  if (b.reviews.length === 0) {
+    listContainer.innerHTML = '<p class="subtle" style="text-align:center;">No reviews yet. Be the first!</p>';
+    return;
+  }
+  
+  let html = '';
+  b.reviews.forEach(r => {
+    html += `<div class="card" style="padding:20px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><strong>${r.name}</strong><span style="color:var(--gold);">${r.stars}</span></div>
+              <p class="subtle">${r.text}</p>
+             </div>`;
+  });
+  listContainer.innerHTML = html;
+}
+
+function submitReview() {
+  const input = document.getElementById('new-review-text');
+  const val = input.value.trim();
+  if(!val) { showToast('Please enter a review', 'danger'); return; }
+  
+  const b = bookDB.find(x => x.id === activeBookId);
+  b.reviews.unshift({ name: isLoggedIn ? 'Sachin Kumar' : 'Guest User', stars: '★★★★★', text: val });
+  input.value = '';
+  showToast('Review posted successfully', 'success');
+  renderReviewsScreen();
+  // Update detail screen count
+  document.getElementById('det-review-count').textContent = (12403 + b.reviews.length) > 1000 ? ((12403 + b.reviews.length)/1000).toFixed(1)+'k' : b.reviews.length;
+}
+
+// ----------------------------------------------------
+// DYNAMIC COMMUNITY REQUESTS
+// ----------------------------------------------------
+function renderCommunity() {
+  let html = '';
+  const sortedReqs = [...communityRequests].sort((a,b) => b.votes - a.votes);
+  sortedReqs.forEach(req => {
+    html += `<div class="list-item" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+              <div style="flex:1;">
+                <h4 style="font-weight:800; font-size:16px;">${req.title}</h4>
+                <p class="subtle" style="font-size:13px;">Requested by <strong style="color:var(--text);">${req.votes}</strong> users</p>
+              </div>
+              <button class="pill success" onclick="upvoteRequest(${req.id})" style="cursor:pointer; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3);">↑ Vote</button>
+             </div>`;
+  });
+  document.getElementById('community-list').innerHTML = html;
+}
+
+function submitBookRequest() {
+  const input = document.getElementById('new-request-input');
+  const val = input.value.trim();
+  if(!val) { showToast('Please enter a book name', 'danger'); return; }
+  
+  communityRequests.push({ id: Date.now(), title: val, votes: 1 });
+  input.value = '';
+  showToast('Book requested successfully!', 'success');
+  renderCommunity();
+}
+
+function upvoteRequest(id) {
+  const req = communityRequests.find(r => r.id === id);
+  if(req) { 
+    req.votes++; 
+    renderCommunity(); 
+    showToast('Vote Added', 'success'); 
+  }
+}
+
+// Reader Settings
 function setReaderTheme(mode, el) {
   const reader = document.getElementById('s-reader');
   reader.style.setProperty('--reader', mode === 'dark' ? '#111827' : mode === 'sepia' ? '#fdf6e3' : '#fffaf2');
@@ -625,6 +839,14 @@ function showToast(msg, type=''){
   const root = document.getElementById('toast'); const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
   root.appendChild(t); requestAnimationFrame(()=> t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=> t.remove(), 260); }, 2200);
 }
+
+// Ensure search pills toggle visual state
+document.querySelectorAll('.filter-bar-dark .chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+        document.querySelectorAll('.filter-bar-dark .chip').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
 
 setTimeout(() => { go('s-splash'); setTimeout(() => go('s-welcome-social'), 1500); }, 100);
 </script>
