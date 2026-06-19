@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PageTurn — High-Fidelity Prototype v8</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f8ff; --bg2:#eef4ff; --surface:#ffffff; --surface2:#f4f7ff;
+  --border:#d8e3ff; --text:#10223d; --text2:#51607d; --text3:#7d8aa6;
+  --gold:#ffbf1f; --coral:#ff6b6b; --coral2:#ff8458; --success:#10b981;
+  --danger:#ef4444; --cream:#fff9ef; --reader:#fffaf2; --readerText:#23140f;
+  scroll-behavior:smooth;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html, body{width:100%;height:100%}
+body{
+  min-height:100vh; display:block;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255,191,31,.22), transparent 24%),
+    radial-gradient(circle at 90% 0%, rgba(255,107,107,.18), transparent 22%),
+    linear-gradient(135deg, #f8fbff 0%, #eef5ff 48%, #fff8f0 100%);
+  font-family:'Inter',sans-serif; overflow:hidden; color:var(--text); padding:0; font-size:16px;
+}
+button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoration:none}
+
+.hint{display:none}
+
+.frame{
+  width:100vw!important; height:100vh!important; border-radius:0!important; box-shadow:none!important; border:none;
+  background:rgba(255,255,255,.72); backdrop-filter:blur(10px); display:flex; position:relative; overflow:hidden!important;
+}
+.sidebar, .notch, .status{display:none!important}
+
+.main-panel{flex:1; min-width:0; position:relative; background:var(--bg);}
+.top-desktop-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 24px 14px 76px;
+  position:sticky; top:0; z-index:30; background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.74));
+  backdrop-filter:blur(16px); border-bottom:1px solid var(--border);
+}
+.top-desktop-pill{
+  background:#fff; border:1px solid var(--border); color:var(--text2); padding:8px 12px; border-radius:999px;
+  font-size:13px; box-shadow:0 8px 24px rgba(16,34,61,.06); pointer-events:none;
+}
+.hamburger{
+  position:fixed; top:18px; left:18px; z-index:65; width:48px; height:48px; border-radius:16px;
+  border:1px solid rgba(16,32,58,.14); background:linear-gradient(135deg,#ffffff,#f1f6ff);
+  box-shadow:0 14px 34px rgba(16,32,58,.12); font-size:20px; color:var(--text); cursor:pointer;
+}
+
+#toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;align-items:center;z-index:9999;pointer-events:none;width:340px;}
+.toast{
+  opacity:0;transform:translateY(10px);transition:all .25s ease;background:rgba(24,28,54,.96);
+  backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:14px;
+  color:var(--text);font-size:13px;font-weight:500;box-shadow:0 10px 24px rgba(0,0,0,.35);text-align:center;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.gold{color:var(--gold);border-color:rgba(212,168,67,.28)}
+.toast.success{color:var(--success);border-color:rgba(76,175,130,.28)}
+
+.screen{
+  position:absolute;inset:0;opacity:0;transform:translateX(28px);pointer-events:none;
+  transition:opacity .28s ease,transform .28s ease;display:flex;flex-direction:column;overflow:hidden;
+}
+.screen.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+.screen.exit-left{opacity:0;transform:translateX(-28px)}
+
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain;}
+.scroll::-webkit-scrollbar{display:none}
+
+.topbar{padding:62px 24px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.topbar h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--text);}
+
+/* Enhanced Back Button Visibility for Headers & Readers */
+.back{
+  width:48px;height:48px;border-radius:50%;border:1px solid rgba(16,32,58,.15);
+  background:rgba(255,255,255,.95);color:var(--text);font-size:20px;
+  box-shadow:0 8px 24px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;z-index:100;
+}
+.ghost{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:14px;min-height:48px;min-width:48px;}
+
+.primary, .secondary, .gold-btn, .danger-btn{
+  width:100%;min-height:52px;border:none;border-radius:14px;font-size:15px;font-weight:700;letter-spacing:.2px;
+}
+.primary{background:var(--coral);color:#fff}
+.secondary{background:linear-gradient(180deg,#fff,#f8fbff);color:var(--text);border:1px solid var(--border)}
+.gold-btn{background:linear-gradient(135deg,#ffbf1f,#ff8458);color:#fff}
+.danger-btn{background:rgba(255,107,107,.16);color:#ff9999;border:1px solid rgba(255,107,107,.2)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.4px;}
+.pill.gold{background:rgba(212,168,67,.12);color:var(--gold);border:1px solid rgba(212,168,67,.22)}
+.pill.coral{background:rgba(232,115,90,.14);color:var(--coral);border:1px solid rgba(232,115,90,.22)}
+.pill.success{background:rgba(76,175,130,.12);color:var(--success);border:1px solid rgba(76,175,130,.22)}
+.pill.soft{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border)}
+
+.card, .item, .story-card, .feature-card, .tutorial-card, .mini-stat, .vote{
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,255,.98));
+  border:1px solid #d8e1ef;border-radius:18px;box-shadow:0 8px 24px rgba(16,32,58,.06);
+}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row{display:flex;gap:10px}
+.input{width:100%;min-height:50px;padding:14px 15px;background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:14px;outline:none;}
+.label{display:block;margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;}
+.subtle{color:var(--text2);font-size:14px;line-height:1.7}
+.title-serif{font-family:'Playfair Display',serif;color:var(--text);}
+.small{font-size:13px;color:var(--text2)}
+
+.book-cover{
+  position:relative;overflow:hidden;border-radius:14px;box-shadow:0 10px 24px rgba(0,0,0,.15);
+  transition:transform .25s ease, box-shadow .25s ease;cursor:pointer;
+}
+.book-cover:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 16px 30px rgba(0,0,0,.3);}
+.book-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.76));border-radius:inherit;}
+.book-title{position:absolute;left:10px;right:10px;bottom:10px;z-index:1;font-size:12px;font-weight:800;color:#fff;line-height:1.25;}
+.book-author{position:absolute;left:10px;right:10px;bottom:26px;z-index:1;font-size:10px;color:rgba(255,255,255,.8);}
+
+.section{margin:0 24px 32px;}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.section-head h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);}
+.link{border:none;background:none;color:var(--coral);font-size:14px;font-weight:700;}
+.chips{display:flex;gap:10px;flex-wrap:wrap;}
+.chip{
+  border:none;border-radius:999px;padding:10px 16px;background:#fff;color:var(--text2);
+  border:1px solid var(--border);font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(16,32,58,.04);
+}
+.chip.active{background:rgba(255,107,107,.1);color:var(--coral);border-color:rgba(255,107,107,.3)}
+
+.kpi{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid var(--border);}
+.kpi strong{font-size:15px;color:var(--text)}
+.progress{height:5px;background:rgba(16,34,61,.1);border-radius:99px;overflow:hidden;}
+.progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--coral))}
+
+.feature-row{overscroll-behavior-x:contain;display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:12px;}
+.feature-row::-webkit-scrollbar{display:none}
+.feature-card{min-width:170px;max-width:170px;padding:16px;}
+.feature-card h4{font-size:15px;font-weight:800;color:var(--text);margin-bottom:5px}
+.feature-card p{font-size:13px;color:var(--text2);line-height:1.6}
+.list{display:flex;flex-direction:column;gap:12px;}
+.item{padding:14px;display:flex;gap:14px;align-items:center;}
+.item .meta{flex:1;min-width:0}
+.item h4{font-size:15px;color:var(--text);margin-bottom:3px}
+.item p{font-size:13px;color:var(--text2)}
+
+.thumb{width:60px;height:88px;flex:0 0 auto;border-radius:10px;overflow:hidden;}
+.thumb.sm{width:60px;height:85px}
+/* Netflix row sizes */
+.thumb.lg{width:140px;height:210px;flex:0 0 auto;border-radius:16px;}
+
+.c1{background:linear-gradient(160deg,#0c2a5b,#0a3b76,#1b6a7f)} .c2{background:linear-gradient(160deg,#1a1a1a,#343434,#ff6b35)}
+.c3{background:linear-gradient(160deg,#7a0000,#c0392b,#f39c12)} .c4{background:linear-gradient(160deg,#4a2c00,#8b6914,#d4ac0d)}
+.c5{background:linear-gradient(160deg,#1a0a0a,#4a0a0a,#8b1919)} .c6{background:linear-gradient(160deg,#05122b,#0d2a6b,#1a4a9b)}
+.c7{background:linear-gradient(160deg,#2d0a3a,#7b2d8b,#e91e8c)} .c8{background:linear-gradient(160deg,#0a2418,#145a32,#1e8449)}
+.c9{background:linear-gradient(160deg,#3d1c00,#8b4513,#d4842a)} .c10{background:linear-gradient(160deg,#0a0a0a,#1a1a2e,#16213e)}
+.c11{background:linear-gradient(160deg,#0a1628,#1a3a6b,#2980b9)} .c12{background:linear-gradient(160deg,#1a0a28,#6c2d8c,#e8735a)}
+.c13{background:linear-gradient(160deg,#0d1b4b,#0f4c81,#1abc9c)} .c14{background:linear-gradient(160deg,#3a1b6b,#7f3fbf,#f97316)}
+.c15{background:linear-gradient(160deg,#14532d,#166534,#22c55e)} .c16{background:linear-gradient(160deg,#7f1d1d,#b91c1c,#ef4444)}
+
+.splash{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#07071a 0%,#0d0d2c 55%,#180a19 100%);}
+.logo{width:88px;height:88px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,#ffbf1f,#ff8458);box-shadow:0 12px 32px rgba(255,132,88,.35);color:#fff;}
+.brand{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:#fff;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(76,175,130,.28)} 50%{box-shadow:0 0 0 16px rgba(76,175,130,0)}}
+@keyframes blink{50%{opacity:0}}
+
+.hero{min-height:420px;margin:16px 18px 0;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 20% 15%, rgba(14,165,233,.30), transparent 22%),radial-gradient(circle at 82% 16%, rgba(255,107,122,.26), transparent 20%),radial-gradient(circle at 50% 100%, rgba(255,191,31,.10), transparent 24%),linear-gradient(160deg,#081022 0%,#0b1630 50%,#1a1030 100%);box-shadow:0 24px 60px rgba(6,10,20,.34);padding:30px 24px 20px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg, rgba(2,6,23,.08), rgba(2,6,23,.84) 82%);}
+.hero-content{position:relative;z-index:1}
+.hero h1{font-family:'Playfair Display',serif;font-size:38px;line-height:1.04;letter-spacing:-.02em;margin-bottom:10px;color:#f7fbff;text-shadow:0 10px 28px rgba(0,0,0,.35);}
+.hero p{font-size:15px;font-weight:500;line-height:1.7;color:rgba(255,255,255,.82);max-width:780px;}
+
+.dots{display:flex;gap:7px;justify-content:center;margin:18px 0 0}
+.dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.16)}
+.dot.active{background:var(--coral);width:18px}
+.nav-rail{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.genre-tile{
+  min-height:88px;border-radius:18px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;
+  border:1px solid rgba(255,255,255,.06);position:relative;overflow:hidden;
+}
+.genre-tile::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.58));}
+.genre-tile strong,.genre-tile span{position:relative;z-index:1}
+.genre-tile strong{font-size:15px;color:#fff}
+.genre-tile span{font-size:11px;color:rgba(255,255,255,.72);margin-top:2px}
+
+.search-box{margin:0 24px 20px;padding:12px 18px;border-radius:16px;border:1.5px solid var(--gold);background:#fff;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(16,34,61,.05);}
+.search-box input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:16px}
+.search-box input::placeholder{color:var(--text3)}
+.filter-bar{padding:0 24px 20px;flex-wrap:nowrap;overflow-x:auto;}
+
+.review{padding:12px 0;border-top:1px solid var(--border)}
+.review:first-child{border-top:none;padding-top:0}
+.review .name{font-size:13px;font-weight:800;color:var(--text)}
+.review .body{font-size:13px;color:var(--text2);line-height:1.7;margin-top:4px}
+.stars{color:var(--gold);font-size:12px;letter-spacing:1px}
+
+/* Overlay & Settings */
+.overlay{background:rgba(16,34,61,.22);backdrop-filter:blur(8px);}
+.overlay .sheet{margin-top:auto;border-radius:24px 24px 0 0;background:rgba(255,255,255,.98);border-top:1px solid rgba(16,34,61,.08);padding:18px 20px 34px;}
+.settings-shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100%;}
+.settings-nav{padding:20px;border-right:1px solid rgba(16,34,61,.08);background:linear-gradient(180deg,#f9fbff,#eef4ff);}
+.settings-nav-title{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:14px;}
+.settings-nav-btn{width:100%;min-height:46px;border-radius:14px;border:1px solid #dce5ff;background:#fff;color:var(--text);margin-bottom:10px;text-align:left;padding:0 14px;font-weight:700;}
+.settings-nav-btn.active{border-color:rgba(255,191,31,.55);background:linear-gradient(180deg, rgba(255,191,31,.16), rgba(255,132,88,.08));color:#b86a00;}
+.settings-nav-note{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(255,107,107,.08);color:var(--text2);font-size:12px;line-height:1.6;border:1px solid rgba(255,107,107,.18);}
+.settings-panels{position:relative;padding-bottom:24px;}
+.settings-panel{display:none;height:100%;}
+.settings-panel.active{display:block}
+.settings-inner{padding:20px 24px 24px;height:100%;}
+.settings-row{display:flex;gap:10px;flex-wrap:wrap;}
+.theme-btn,.font-btn{flex:1 1 120px;min-height:48px;border-radius:14px;border:1.5px solid var(--border);background:linear-gradient(180deg,#fff,#f5f8ff);color:var(--text);font-size:14px;font-weight:700}
+.theme-btn.active,.font-btn.active{border-color:var(--gold);background:linear-gradient(180deg, rgba(255,191,31,.16), rgba(255,132,88,.10));color:#b86a00}
+.reader-tip{padding:12px 14px;border-radius:14px;border:1px solid #d7e4f7;background:linear-gradient(180deg,#fff,#f2f8ff);color:var(--text2);font-size:13px;line-height:1.7;}
+
+.reader{background:var(--reader);color:var(--readerText);}
+.reader .reader-top{position:absolute;top:0;left:0;right:0;padding:30px 24px 10px;z-index:50;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,var(--reader),rgba(255,250,242,0));}
+.reader-content{padding:112px 48px 136px;font-family:'Lora',serif;font-size:20px;line-height:2.05;max-width:960px;margin:0 auto;height:100%;overflow-y:auto;}
+.reader-content p{margin-bottom:22px}
+.reader-content p:first-child::first-letter{float:left;font-size:64px;font-weight:800;line-height:.85;color:var(--gold);margin:6px 10px 0 0;font-family:'Playfair Display',serif;}
+.reader-bottom{position:absolute;left:0;right:0;bottom:0;padding:12px 32px 30px;background:linear-gradient(180deg,rgba(255,250,242,0),var(--reader));}
+.reader-progress-wrap{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.reader-track{flex:1;height:5px;border-radius:99px;background:rgba(16,34,61,.10);overflow:hidden}
+.reader-fill{height:100%;width:38%;background:linear-gradient(90deg,#ffbf1f,#ff8458);border-radius:99px;transition:width .3s ease}
+
+.selection-toolbar{position:absolute;right:28px;bottom:92px;z-index:35;display:none;gap:8px;padding:10px;border-radius:16px;background:rgba(255,255,255,.96);border:1px solid rgba(16,34,61,.08);box-shadow:0 20px 44px rgba(16,34,61,.14);}
+.selection-toolbar button{border:none;background:linear-gradient(180deg,#f4f7ff,#ffffff);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:700;font-size:13px;}
+.selection-toolbar button.primary-tool{background:linear-gradient(135deg,#ffbf1f,#ff8458);color:#fff;}
+.highlighted-text{background:linear-gradient(90deg, rgba(255,179,71,.25), rgba(255,92,122,.18));border-radius:4px;padding:0 2px;}
+.reader-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.18);color:#1657b8;font-size:12px;font-weight:800;}
+
+.bottom-nav{display:none !important;}
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mini-stat{padding:12px;text-align:center;}
+.mini-stat strong{display:block;font-size:20px;font-family:'Playfair Display',serif}
+.mini-stat span{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px}
+.badge-list{display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700;background:#fff;border:1px solid var(--border);color:var(--text2)}
+.badge.active{background:rgba(76,175,130,.12);border-color:rgba(76,175,130,.22);color:var(--success)}
+
+/* Drawer */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(7,12,24,.42);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:58;}
+.drawer-backdrop.show{opacity:1;pointer-events:auto;}
+.drawer{
+  position:fixed;top:12px;left:12px;bottom:12px;width:min(390px,calc(100vw - 24px));
+  background:linear-gradient(180deg,#ffffff 0%,#f6f9ff 100%);border:1px solid rgba(16,32,58,.12);
+  border-radius:24px;box-shadow:0 28px 80px rgba(16,32,58,.22);transform:translateX(-112%);
+  transition:transform .3s ease;z-index:60;padding:18px 18px 22px;overflow:auto;
+}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.drawer-title{font-family:'Playfair Display',serif;font-size:24px;color:#10203a;}
+.drawer-close{width:40px;height:40px;border:none;background:#eef4ff;border-radius:12px;font-size:18px;color:#10203a;}
+
+.drawer-group{border:1px solid rgba(16,32,58,.1);border-radius:18px;background:#fff;margin-bottom:12px;overflow:hidden;}
+.drawer-group>summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:800;color:#10203a;display:flex;justify-content:space-between;align-items:center;}
+.drawer-group>summary::-webkit-details-marker{display:none}
+.drawer-group>summary::after{content:'▾';color:#6b7b94;font-size:14px}
+.drawer-group[open]>summary::after{content:'▴'}
+.drawer-grid{padding:0 12px 12px;display:grid;grid-template-columns:1fr;gap:8px;}
+.drawer-subgroup{border-top:1px solid #eef2f7;padding-top:10px;margin-top:10px;}
+.drawer-subgroup>summary{cursor:pointer;font-size:13px;font-weight:700;color:#22324d;padding:6px 4px;display:flex;justify-content:space-between;align-items:center;}
+.drawer-subgroup>summary::after{content:'+';color:#6b7b94}
+.drawer-subgroup[open]>summary::after{content:'–'}
+.drawer-link{
+  width:100%;border:none;background:linear-gradient(135deg,#f7faff,#eef4ff);color:#1d3354;
+  border-radius:14px;padding:11px 12px;font-size:13px;font-weight:700;text-align:left;cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.drawer-link:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(16,32,58,.08)}
+
+/* Hero specifics */
+#s-welcome-social .hero{background:linear-gradient(180deg,#fff9ee 0%,#eff6ff 54%,#ffffff 100%);border-radius:28px;margin:16px 18px 0;border:1px solid rgba(16,32,58,.08);box-shadow:0 12px 34px rgba(16,32,58,.08);}
+#s-welcome-social .hero::before{background:radial-gradient(circle at 30% 10%, rgba(255,140,90,.18), transparent 22%),radial-gradient(circle at 80% 20%, rgba(14,165,233,.18), transparent 18%),linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.92) 82%);}
+#s-welcome-social .hero h1{color:#10203a;text-shadow:none;}
+#s-welcome-social .hero p{color:var(--text2);}
+
+/* Hero covers animation for tutorials */
+.hero-covers{position:relative;z-index:1;display:flex;gap:14px;margin-top:18px;flex-wrap:wrap;}
+.hero-cover{width:170px;height:218px;border-radius:20px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 40px rgba(0,0,0,.28);animation:coverFloat 6.5s ease-in-out infinite;position:relative;}
+.hero-cover:nth-child(2){animation-delay:1.2s}
+.hero-cover:nth-child(3){animation-delay:2.1s}
+.hero-cover::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg, transparent 28%, rgba(0,0,0,.78));}
+.hero-cover strong, .hero-cover span, .hero-cover .mini{position:relative;z-index:1}
+.hero-cover span{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:rgba(255,255,255,.76);}
+.hero-cover strong{font-family:'Playfair Display',serif;font-size:24px;line-height:1.02;margin-top:6px;}
+.hero-cover .mini{font-size:12px;color:rgba(255,255,255,.82);margin-top:6px;}
+@keyframes coverFloat{0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-8px) rotate(1deg)}}
+
+.theme-strip{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px;}
+.theme-swatch{flex:1 1 90px;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;text-align:center;}
+.theme-swatch.active{outline:2px solid rgba(59,130,246,.22);border-color:#7cb1ff;}
+
+/* Frame themes */
+.frame[data-theme="bright"]{ --bg:#f6f8ff; --surface:#ffffff; --surface2:#eef4ff; --text:#10203a; --text2:#4d5d77; --text3:#7c8ba2; --border:#dbe4f1; --gold:#0ea5e9; --coral:#ff5d7a; --success:#16a34a; --reader:#fffaf2; --readerText:#1f2a3d; }
+.frame[data-theme="midnight"]{ --bg:#0b1221; --surface:#121b30; --surface2:#18233d; --text:#f4f7fb; --text2:#bec8dc; --text3:#8997b2; --border:#24314d; --gold:#f4b942; --coral:#ff6b6b; --success:#5ed39a; --reader:#141926; --readerText:#edf2ff; }
+.frame[data-theme="sepia"]{ --bg:#f4e9d7; --surface:#fffaf0; --surface2:#f7ecd8; --text:#3c2c1f; --text2:#6d5844; --text3:#8d7763; --border:#e5d8c5; --gold:#c18b2e; --coral:#cc6f4a; --success:#2c8a63; --reader:#f9f0e2; --readerText:#3c2c1f; }
+.frame[data-theme="contrast"]{ --bg:#ffffff; --surface:#ffffff; --surface2:#f2f2f2; --text:#000000; --text2:#2c2c2c; --text3:#5b5b5b; --border:#000000; --gold:#005fcc; --coral:#b00020; --success:#006b3c; --reader:#ffffff; --readerText:#000000; }
+</style>
+</head>
+<body>
+
+<button class="hamburger pulse" id="hamburgerBtn" onclick="toggleDrawer()" aria-label="Open menu">☰</button>
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-label="Navigation menu">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title">PageTurn</div>
+      <div style="font-size:12px;color:#5b6b83;margin-top:2px;">Full-screen reading website</div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
+  </div>
+
+  <div class="theme-strip" aria-label="Theme picker">
+    <button class="theme-swatch active" data-theme-choice="bright" onclick="setSiteTheme('bright', this)">Bright</button>
+    <button class="theme-swatch" data-theme-choice="midnight" onclick="setSiteTheme('midnight', this)">Dark</button>
+    <button class="theme-swatch" data-theme-choice="sepia" onclick="setSiteTheme('sepia', this)">Sepia</button>
+    <button class="theme-swatch" data-theme-choice="contrast" onclick="setSiteTheme('contrast', this)">High contrast</button>
+  </div>
+
+  <details class="drawer-group" open>
+    <summary>Development flow</summary>
+    <div class="drawer-grid">
+      <button class="drawer-link" onclick="go('s-welcome-social'); closeDrawer()">Onboarding</button>
+      <button class="drawer-link" onclick="go('s-genre-pick'); closeDrawer()">Genre-first onboarding</button>
+      <button class="drawer-link" onclick="go('s-plans'); closeDrawer()">Choose a plan</button>
+      <button class="drawer-link" onclick="go('s-home'); closeDrawer()">Home (Netflix Style)</button>
+      <button class="drawer-link" onclick="go('s-search'); closeDrawer()">Search & filters</button>
+    </div>
+  </details>
+
+  <details class="drawer-group">
+    <summary>Reader tools</summary>
+    <div class="drawer-grid">
+      <details class="drawer-subgroup">
+        <summary>Core reading</summary>
+        <button class="drawer-link" onclick="go('s-book-detail'); closeDrawer()">Book detail</button>
+        <button class="drawer-link" onclick="go('s-reader'); closeDrawer()">Open reader</button>
+        <button class="drawer-link" onclick="go('s-reader-settings'); closeDrawer()">Backgrounds & text size</button>
+      </details>
+      <details class="drawer-subgroup">
+        <summary>Reader states</summary>
+        <button class="drawer-link" onclick="go('s-downloads'); closeDrawer()">Downloads</button>
+        <button class="drawer-link" onclick="go('s-offline'); closeDrawer()">Offline reading</button>
+        <button class="drawer-link" onclick="go('s-no-results'); closeDrawer()">No results state</button>
+      </details>
+      <button class="drawer-link" onclick="go('s-community'); closeDrawer()">Community voting</button>
+      <button class="drawer-link" onclick="go('s-wishlist'); closeDrawer()">Wishlist</button>
+      <button class="drawer-link" onclick="go('s-profile'); closeDrawer()">Profile</button>
+    </div>
+  </details>
+
+  <details class="drawer-group">
+    <summary>Support modules</summary>
+    <div class="drawer-grid">
+      <button class="drawer-link" onclick="go('s-payment-failed'); closeDrawer()">Payment failed</button>
+      <button class="drawer-link" onclick="go('s-success'); closeDrawer()">Success state</button>
+      <button class="drawer-link" onclick="go('s-edit-profile'); closeDrawer()">Edit profile</button>
+      <button class="drawer-link" onclick="go('s-collections'); closeDrawer()">Curated collections</button>
+    </div>
+  </details>
+</aside>
+
+<div class="frame" data-theme="bright">
+  <div id="toast"></div>
+
+  <div class="main-panel">
+    <div class="top-desktop-bar">
+      <div class="top-desktop-pill">Desktop canvas · Menu on Top Left</div>
+    </div>
+
+  <!-- SPLASH -->
+  <section class="screen active" id="s-splash">
+    <div class="splash" onclick="go('s-tutorial-1')">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+        <div class="logo">📖</div>
+        <div class="brand">PageTurn</div>
+        <div class="subtle" style="letter-spacing:2px;text-transform:uppercase;text-align:center;color:#fff;">The world's books</div>
+        <div style="width:54px;height:3px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:24px"><span style="display:block;width:100%;height:100%;background:linear-gradient(90deg,var(--gold),var(--coral));"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TUTORIAL 1 -->
+  <section class="screen" id="s-tutorial-1">
+    <div class="scroll">
+      <div class="hero">
+        <div class="hero-content">
+          <span class="pill gold">ONBOARDING</span>
+          <h1>Read anywhere.<br>Keep every book with you.</h1>
+          <p>PageTurn is designed for mobile-first reading, with offline access and progress sync.</p>
+          <div class="hero-covers">
+            <div class="hero-cover c11"><span>Read anywhere</span><strong>Offline-ready</strong></div>
+            <div class="hero-cover c7"><span>Streamlined UX</span><strong>Keep reading</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="tutorial-card section" style="margin-top:24px">
+        <h3 class="title-serif">A library in your pocket</h3>
+        <p>Browse curated collections, bestselling books, and personalized recommendations.</p>
+        <div class="nav-rail">
+          <button class="secondary" style="width:104px" onclick="go('s-welcome-social')">Skip</button>
+          <button class="primary" style="width:104px" onclick="go('s-tutorial-2')">Next →</button>
+        </div>
+        <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TUTORIAL 2 -->
+  <section class="screen" id="s-tutorial-2">
+    <div class="scroll">
+      <div class="hero">
+        <div class="hero-content">
+          <span class="pill gold">FEATURES</span>
+          <h1>Night mode, downloads,<br>and progress.</h1>
+        </div>
+      </div>
+      <div class="tutorial-card section" style="margin-top:24px">
+        <h3 class="title-serif">Built for real usage</h3>
+        <p>Includes offline reading, reader settings, and search filters.</p>
+        <div class="nav-rail">
+          <button class="secondary" style="width:104px" onclick="back()">← Back</button>
+          <button class="primary" style="width:104px" onclick="go('s-tutorial-3')">Next →</button>
+        </div>
+        <div class="dots"><span class="dot"></span><span class="dot active"></span><span class="dot"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TUTORIAL 3 -->
+  <section class="screen" id="s-tutorial-3">
+    <div class="scroll">
+      <div class="hero">
+        <div class="hero-content">
+          <span class="pill gold">PERSONALISATION</span>
+          <h1>Personalised by genre,<br>with social proof.</h1>
+        </div>
+      </div>
+      <div class="tutorial-card section" style="margin-top:24px">
+        <div class="feature-row" style="padding-bottom:0">
+          <div class="feature-card"><h4>Genre-first</h4><p>Pick 3 genres and get recommendations instantly.</p></div>
+          <div class="feature-card"><h4>Social proof</h4><p>Show active readers and trending books.</p></div>
+        </div>
+        <div class="nav-rail">
+          <button class="secondary" style="width:104px" onclick="back()">← Back</button>
+          <button class="gold-btn" style="width:132px" onclick="go('s-welcome-social')">Start exploring</button>
+        </div>
+        <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot active"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WELCOME / SOCIAL -->
+  <section class="screen" id="s-welcome-social">
+    <div class="scroll">
+      <div class="hero">
+        <div class="hero-content">
+          <span class="pill success">JOIN 2,000,000+ READERS</span>
+          <h1>Find your next book.<br>Keep reading every day.</h1>
+          <p>Unlimited access to thousands of audiobooks, ebooks, and more. Netflix for books.</p>
+        </div>
+      </div>
+      <div class="section" style="margin-top:24px">
+        <div class="mini-stats">
+          <div class="mini-stat card"><strong>50K+</strong><span>Books</span></div>
+          <div class="mini-stat card"><strong>4.8★</strong><span>Avg rating</span></div>
+          <div class="mini-stat card"><strong>14d</strong><span>Free trial</span></div>
+        </div>
+      </div>
+      <div class="section">
+        <button class="primary" onclick="go('s-genre-pick')">Continue with personalised onboarding</button>
+        <div style="height:10px"></div>
+        <button class="secondary" onclick="go('s-signup')">Sign in with email</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENRE PICK -->
+  <section class="screen" id="s-genre-pick">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Choose genres</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section"><p class="subtle">Pick at least 3 to curate your homepage.</p></div>
+      <div class="section">
+        <div class="grid-2">
+          <div class="genre-tile c11" onclick="this.classList.toggle('active')"><strong>Business</strong><span>12,400 books</span></div>
+          <div class="genre-tile c7" onclick="this.classList.toggle('active')"><strong>Romance</strong><span>8,700 books</span></div>
+          <div class="genre-tile c8" onclick="this.classList.toggle('active')"><strong>Self-help</strong><span>9,100 books</span></div>
+          <div class="genre-tile c14" onclick="this.classList.toggle('active')"><strong>Fantasy</strong><span>11,200 books</span></div>
+          <div class="genre-tile c4" onclick="this.classList.toggle('active')"><strong>Sci-Fi</strong><span>6,800 books</span></div>
+          <div class="genre-tile c6" onclick="this.classList.toggle('active')"><strong>Science</strong><span>7,300 books</span></div>
+        </div>
+      </div>
+      <div class="section"><button class="primary" onclick="go('s-signup')">Continue →</button></div>
+    </div>
+  </section>
+
+  <!-- SIGNUP -->
+  <section class="screen" id="s-signup">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Create account</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section"><label class="label">Full name</label><input class="input" value="Sachin Kumar"></div>
+      <div class="section"><label class="label">Email</label><input class="input" value="sachin@example.com"></div>
+      <div class="section"><label class="label">Password</label><input class="input" value="password123" type="password"></div>
+      <div class="section">
+        <button class="primary" onclick="go('s-otp')">Send verification code →</button>
+        <div style="height:10px"></div>
+        <button class="secondary" onclick="go('s-otp')">Continue with Google</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- OTP -->
+  <section class="screen" id="s-otp">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Verify email</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section" style="text-align:center">
+        <div class="logo" style="margin:0 auto 14px;font-size:34px">📬</div>
+        <h1 class="title-serif" style="font-size:28px;margin-bottom:8px">Check your inbox</h1>
+        <p class="subtle">We sent a 6-digit code to <strong style="color:var(--gold)">sachin@example.com</strong></p>
+      </div>
+      <div class="section">
+        <div class="row" style="justify-content:center;gap:10px">
+          <div class="card" style="width:48px;height:58px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold);">3</div>
+          <div class="card" style="width:48px;height:58px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold);">7</div>
+          <div class="card" style="width:48px;height:58px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold);">4</div>
+          <div class="card" style="width:48px;height:58px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold);">8</div>
+          <div class="card" style="width:48px;height:58px;display:flex;align-items:center;justify-content:center;font-size:22px;border-color:var(--gold);animation:blink 1s step-end infinite">_</div>
+          <div class="card" style="width:48px;height:58px;display:flex;align-items:center;justify-content:center;font-size:22px"> </div>
+        </div>
+      </div>
+      <div class="section"><button class="primary" onclick="go('s-plans')">Verify and continue →</button></div>
+    </div>
+  </section>
+
+  <!-- PLANS -->
+  <section class="screen" id="s-plans">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Choose a plan</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section list">
+        <div class="card" style="padding:18px;cursor:pointer" onclick="go('s-payment-trial')">
+          <span class="pill success" style="margin-bottom:10px">14 DAYS FREE</span>
+          <h3 class="title-serif" style="font-size:20px">Free Trial</h3>
+          <div style="font-size:24px;font-weight:800;color:var(--text)">₹0 <span class="small">for 14 days</span></div>
+        </div>
+        <div class="card" style="padding:18px;border-color:rgba(212,168,67,.34);background:rgba(212,168,67,.05);cursor:pointer" onclick="go('s-payment-annual')">
+          <span class="pill gold" style="margin-bottom:10px">BEST VALUE — SAVE 40%</span>
+          <h3 class="title-serif" style="font-size:20px">Annual Plan</h3>
+          <div style="font-size:24px;font-weight:800;color:var(--text)">₹799 <span class="small">/ month</span></div>
+        </div>
+        <div class="card" style="padding:18px;cursor:pointer" onclick="go('s-payment-monthly')">
+          <h3 class="title-serif" style="font-size:20px">Monthly Plan</h3>
+          <div style="font-size:24px;font-weight:800;color:var(--text)">₹1,199 <span class="small">/ month</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAYMENT ANNUAL -->
+  <section class="screen" id="s-payment-annual">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Payment details</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section">
+        <div class="card" style="padding:16px">
+          <div class="kpi" style="border:none;padding:0 0 8px 0;"><span>Annual Plan × 1</span><strong>₹9,588</strong></div>
+          <div class="kpi" style="border:none;padding:0 0 8px 0;"><span>Discount (40%)</span><strong style="color:var(--success)">−₹3,996</strong></div>
+          <div class="kpi" style="border:none;padding:8px 0 0 0;border-top:1px solid var(--border);"><span><strong>Total today</strong></span><strong style="color:var(--gold)">₹5,992</strong></div>
+        </div>
+      </div>
+      <div class="section"><label class="label">Card number</label><input class="input" value="4242 4242 4242 4242"></div>
+      <div class="section row">
+        <div style="flex:1"><label class="label">Expiry</label><input class="input" value="12 / 27"></div>
+        <div style="flex:1"><label class="label">CVV</label><input class="input" value="•••"></div>
+      </div>
+      <div class="section">
+        <button class="gold-btn" onclick="go('s-success')">🔒 Pay ₹5,992 securely</button>
+        <div style="height:10px"></div>
+        <button class="secondary" onclick="go('s-payment-failed')">Test Payment Failure</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="s-payment-trial">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Payment details</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section card" style="padding:18px">
+        <span class="pill success">NO CARD REQUIRED</span>
+        <h3 class="title-serif" style="font-size:20px;margin-top:10px">Free Trial selected</h3>
+        <p class="subtle" style="margin-top:8px">14 days of full access.</p>
+      </div>
+      <div class="section"><button class="primary" onclick="go('s-success')">Start free trial →</button></div>
+    </div>
+  </section>
+
+  <section class="screen" id="s-payment-monthly">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Payment details</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section card" style="padding:16px"><div class="kpi" style="border:none;padding:0;"><span>Monthly Plan</span><strong>₹1,199</strong></div></div>
+      <div class="section"><button class="gold-btn" onclick="go('s-success')">🔒 Pay ₹1,199 securely</button></div>
+    </div>
+  </section>
+
+  <!-- PAYMENT FAILED -->
+  <section class="screen" id="s-payment-failed">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Payment failed</h2>
+        <button class="ghost" style="border-radius:50%">!</button>
+      </div>
+      <div class="section" style="text-align:center">
+        <div class="logo" style="margin:0 auto 14px;background:linear-gradient(135deg,#ff6b6b,#d94c4c)">✖</div>
+        <h1 class="title-serif" style="font-size:28px">Transaction declined</h1>
+      </div>
+      <div class="section list">
+        <button class="primary" onclick="go('s-payment-annual')">Retry payment</button>
+        <button class="secondary" onclick="showToast('Use UPI/Other','gold')">Use another method</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUCCESS -->
+  <section class="screen" id="s-success">
+    <div class="scroll">
+      <div class="section" style="padding-top:100px;text-align:center">
+        <div class="logo" style="margin:0 auto 16px;animation:pulse 2s ease infinite;background:linear-gradient(135deg,#10b981,#059669)">✅</div>
+        <h1 class="title-serif" style="font-size:30px;line-height:1.2;margin-bottom:10px">You're all set,<br>Sachin!</h1>
+        <p class="subtle" style="max-width:280px;margin:0 auto 20px">Your plan is active. Start browsing.</p>
+        <button class="primary" onclick="go('s-home')">Explore the library →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOME (Netflix / Hoopla UI/UX Integration) -->
+  <section class="screen" id="s-home">
+    <div class="scroll" style="padding-top:20px;">
+      
+      <!-- Topbar with Search & Profile Integration -->
+      <div class="section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+          <div>
+            <div style="font-size:14px; color:var(--text2); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Good morning</div>
+            <h2 style="font-family:'Playfair Display',serif; font-size:32px;">Sachin 👋</h2>
+          </div>
+          <button class="back" style="width:48px;height:48px;" onclick="go('s-profile')">S</button>
+        </div>
+        
+        <div class="search-box" style="margin:0 0 24px 0; cursor:pointer;" onclick="go('s-search')">
+          <span style="font-size:20px;color:var(--coral)">🔍</span>
+          <input readonly placeholder="Search books, authors, genres..." value="" style="cursor:pointer;">
+        </div>
+
+        <!-- Integrated from original v7 -->
+        <div class="card" style="padding:16px; margin-bottom:24px;">
+          <div class="kpi" style="border:none; padding:0 0 10px 0;">
+            <span><strong>2026 Reading Challenge</strong><br><span class="small">23 of 30 books • on track</span></span>
+            <span class="pill gold">77%</span>
+          </div>
+          <div class="progress"><span style="width:77%"></span></div>
+        </div>
+      </div>
+
+      <!-- ROW 1: Continue Reading -->
+      <div class="section">
+        <div class="section-head"><h3>Continue Reading</h3><button class="link" onclick="go('s-reader')">Open</button></div>
+        <div class="feature-row">
+          <div class="item card" style="min-width:280px; padding:12px;" onclick="go('s-reader')">
+            <div class="thumb sm book-cover c2"></div>
+            <div style="flex:1;">
+              <h4 style="font-size:15px; margin-bottom:4px;">Atomic Habits</h4>
+              <p style="font-size:12px; color:var(--text2); margin-bottom:8px;">James Clear</p>
+              <div class="progress"><span style="width:43%"></span></div>
+              <p style="font-size:11px; color:var(--text3); margin-top:4px;">43% complete</p>
+            </div>
+          </div>
+          <div class="item card" style="min-width:280px; padding:12px;" onclick="go('s-reader')">
+            <div class="thumb sm book-cover c1"></div>
+            <div style="flex:1;">
+              <h4 style="font-size:15px; margin-bottom:4px;">Deep Work</h4>
+              <p style="font-size:12px; color:var(--text2); margin-bottom:8px;">Cal Newport</p>
+              <div class="progress"><span style="width:14%"></span></div>
+              <p style="font-size:11px; color:var(--text3); margin-top:4px;">14% complete</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Trending Now (Netflix Style) -->
+      <div class="section">
+        <div class="section-head"><h3>Trending Now 🔥</h3><button class="link" onclick="go('s-search')">Explore</button></div>
+        <div class="feature-row">
+          <div class="thumb lg book-cover c7" onclick="go('s-book-detail')">
+            <div class="book-author">Matt Haig</div><div class="book-title">The Midnight Library</div>
+          </div>
+          <div class="thumb lg book-cover c4" onclick="go('s-book-detail')">
+            <div class="book-author">Yuval Noah Harari</div><div class="book-title">Sapiens</div>
+          </div>
+          <div class="thumb lg book-cover c3" onclick="go('s-book-detail')">
+            <div class="book-author">Paulo Coelho</div><div class="book-title">The Alchemist</div>
+          </div>
+          <div class="thumb lg book-cover c13" onclick="go('s-book-detail')">
+            <div class="book-author">Frank Herbert</div><div class="book-title">Dune</div>
+          </div>
+          <div class="thumb lg book-cover c2" onclick="go('s-book-detail')">
+            <div class="book-author">James Clear</div><div class="book-title">Atomic Habits</div>
+          </div>
+          <div class="thumb lg book-cover c12" onclick="go('s-book-detail')">
+            <div class="book-author">Taylor Jenkins Reid</div><div class="book-title">The Seven Husbands</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- V7 Feature Preservation: Collections / Editor's Choices -->
+      <div class="section">
+        <div class="section-head"><h3>Personalised for you</h3><button class="link" onclick="go('s-collections')">Collections</button></div>
+        <div class="feature-row">
+          <div class="feature-card card" onclick="go('s-book-detail')">
+            <h4>Business picks</h4><p>Books based on your selected genres.</p>
+          </div>
+          <div class="feature-card card" onclick="go('s-book-detail')">
+            <h4>Editor’s choices</h4><p>Curated recommendations with social proof.</p>
+          </div>
+          <div class="feature-card card" onclick="go('s-wishlist')">
+            <h4>Want-to-read</h4><p>Your saved list of upcoming books.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3: Sci-Fi & Fantasy (Netflix Style) -->
+      <div class="section">
+        <div class="section-head"><h3>Sci-Fi & Fantasy</h3><button class="link" onclick="go('s-search')">Explore</button></div>
+        <div class="feature-row">
+          <div class="thumb lg book-cover c14" onclick="go('s-book-detail')">
+            <div class="book-author">Andy Weir</div><div class="book-title">Project Hail Mary</div>
+          </div>
+          <div class="thumb lg book-cover c11" onclick="go('s-book-detail')">
+            <div class="book-author">Isaac Asimov</div><div class="book-title">Foundation</div>
+          </div>
+          <div class="thumb lg book-cover c6" onclick="go('s-book-detail')">
+            <div class="book-author">William Gibson</div><div class="book-title">Neuromancer</div>
+          </div>
+          <div class="thumb lg book-cover c10" onclick="go('s-book-detail')">
+            <div class="book-author">Neal Stephenson</div><div class="book-title">Snow Crash</div>
+          </div>
+          <div class="thumb lg book-cover c3" onclick="go('s-book-detail')">
+            <div class="book-author">Andy Weir</div><div class="book-title">The Martian</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 4: Business & Productivity (Netflix Style) -->
+      <div class="section">
+        <div class="section-head"><h3>Business & Productivity</h3><button class="link" onclick="go('s-search')">Explore</button></div>
+        <div class="feature-row">
+          <div class="thumb lg book-cover c1" onclick="go('s-book-detail')">
+            <div class="book-author">Cal Newport</div><div class="book-title">Deep Work</div>
+          </div>
+          <div class="thumb lg book-cover c9" onclick="go('s-book-detail')">
+            <div class="book-author">Peter Thiel</div><div class="book-title">Zero to One</div>
+          </div>
+          <div class="thumb lg book-cover c5" onclick="go('s-book-detail')">
+            <div class="book-author">Phil Knight</div><div class="book-title">Shoe Dog</div>
+          </div>
+          <div class="thumb lg book-cover c4" onclick="go('s-book-detail')">
+            <div class="book-author">Jim Collins</div><div class="book-title">Good to Great</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 5: Thrillers & Mysteries -->
+      <div class="section">
+        <div class="section-head"><h3>Thrillers & Mysteries</h3><button class="link" onclick="go('s-search')">Explore</button></div>
+        <div class="feature-row">
+          <div class="thumb lg book-cover c16" onclick="go('s-book-detail')">
+            <div class="book-author">Gillian Flynn</div><div class="book-title">Gone Girl</div>
+          </div>
+          <div class="thumb lg book-cover c12" onclick="go('s-book-detail')">
+            <div class="book-author">Paula Hawkins</div><div class="book-title">The Girl on the Train</div>
+          </div>
+          <div class="thumb lg book-cover c15" onclick="go('s-book-detail')">
+            <div class="book-author">Alex Michaelides</div><div class="book-title">The Silent Patient</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- V7 Feature Preservation: Curated by Mood & Streaks -->
+      <div class="section">
+        <div class="section-head"><h3>Curated by mood</h3><button class="link" onclick="go('s-collections')">Open</button></div>
+        <div class="grid-2">
+          <div class="story-card card" style="padding:16px;" onclick="go('s-collections')"><h4>Need focus?</h4><p class="small">Short books and deep-work picks.</p></div>
+          <div class="story-card card" style="padding:16px;" onclick="go('s-collections')"><h4>Need escape?</h4><p class="small">Light fiction and page-turners.</p></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>Reading streak</h3><button class="link" onclick="showToast('🔥 Streak milestone reached','gold')">Milestone</button></div>
+        <div class="card" style="padding:16px">
+          <div class="kpi" style="border:none;padding:0 0 10px 0;"><span>Current streak</span><strong>14 days</strong></div>
+          <div class="progress"><span style="width:82%"></span></div>
+          <p class="small" style="margin-top:8px">A streak helps readers return every day.</p>
+        </div>
+      </div>
+      
+      <div style="height:40px;"></div>
+    </div>
+  </section>
+
+  <!-- COLLECTIONS -->
+  <section class="screen" id="s-collections">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Curated collections</h2>
+        <button class="ghost" style="border-radius:50%">⟳</button>
+      </div>
+      <div class="section list">
+        <div class="story-card card" style="padding:18px;" onclick="go('s-book-detail')">
+          <h4>Need focus?</h4><p class="subtle">Books that support concentration, work, and habit building.</p>
+        </div>
+        <div class="story-card card" style="padding:18px;" onclick="go('s-book-detail')">
+          <h4>Need motivation?</h4><p class="subtle">Biographies, self-help, and action-oriented reading.</p>
+        </div>
+        <div class="story-card card" style="padding:18px;" onclick="go('s-book-detail')">
+          <h4>Need a reset?</h4><p class="subtle">Light fiction and uplifting stories for a slower evening.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="screen" id="s-search">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Search</h2>
+        <button class="ghost" style="border-radius:50%">⚙</button>
+      </div>
+      <div class="search-box">
+        <span style="font-size:20px;color:var(--coral)">🔍</span>
+        <input placeholder="Search books, authors, genres..." value="Atomic">
+      </div>
+      <div class="filter-bar">
+        <button class="chip active">Popular</button>
+        <button class="chip">Genres</button>
+        <button class="chip">Author</button>
+        <button class="chip">Rating</button>
+        <button class="chip">Offline</button>
+      </div>
+      <div class="section">
+        <div class="section-head"><h3>Recent searches</h3></div>
+        <div class="chips">
+          <button class="chip" onclick="showToast('Applied: business','gold')">business</button>
+          <button class="chip" onclick="showToast('Applied: habits','gold')">habits</button>
+          <button class="chip" onclick="showToast('Applied: productivity','gold')">productivity</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h3>Trending authors</h3><button class="link" onclick="go('s-results')">Results</button></div>
+        <div class="list">
+          <div class="item card" onclick="go('s-results')"><div class="thumb sm book-cover c2"></div><div class="meta"><h4>James Clear</h4><p>High-signal books on habits</p></div><span>›</span></div>
+          <div class="item card" onclick="go('s-results')"><div class="thumb sm book-cover c7"></div><div class="meta"><h4>Paulo Coelho</h4><p>Popular fiction and inspiration</p></div><span>›</span></div>
+        </div>
+      </div>
+      <div class="section">
+        <button class="primary" onclick="go('s-results')">Show results</button>
+        <div style="height:10px"></div>
+        <button class="secondary" onclick="go('s-no-results')">Show no results state</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="s-results">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Search results</h2>
+        <button class="ghost" style="border-radius:50%">☰</button>
+      </div>
+      <div class="section list">
+        <div class="item card" onclick="go('s-book-detail')">
+          <div class="thumb book-cover c2"></div>
+          <div class="meta">
+            <h4>Atomic Habits</h4><p>James Clear</p>
+            <div class="chips" style="margin-top:8px"><span class="pill gold">4.8★</span><span class="pill soft">Best seller</span></div>
+          </div>
+        </div>
+        <div class="item card" onclick="go('s-book-detail')">
+          <div class="thumb book-cover c1"></div>
+          <div class="meta">
+            <h4>Deep Work</h4><p>Cal Newport</p>
+            <div class="chips" style="margin-top:8px"><span class="pill gold">4.7★</span><span class="pill soft">Productivity</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NO RESULTS -->
+  <section class="screen" id="s-no-results">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>No results</h2>
+        <button class="ghost" style="border-radius:50%">?</button>
+      </div>
+      <div class="section" style="text-align:center;padding-top:70px">
+        <div class="logo" style="margin:0 auto 14px;background:linear-gradient(135deg,#e8735a,#a93d3d)">?</div>
+        <h1 class="title-serif" style="font-size:28px">Nothing matched</h1>
+        <p class="subtle" style="max-width:280px;margin:8px auto 0">Nothing matched. Try another term or browse by genre.</p>
+      </div>
+      <div class="section list">
+        <button class="primary" onclick="go('s-search')">Try another search</button>
+        <button class="secondary" onclick="go('s-home')">Go to home</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOK DETAIL -->
+  <section class="screen" id="s-book-detail">
+    <div class="scroll">
+      <div class="topbar" style="position:absolute;top:16px;left:24px;right:24px;z-index:20;padding:0;display:flex;justify-content:space-between;align-items:center;background:transparent;">
+        <button class="back" onclick="back()">←</button>
+        <button class="back" style="color:var(--coral);" onclick="showToast('Added to Wishlist','success'); go('s-wishlist');">♥</button>
+      </div>
+      
+      <div style="height:400px; position:relative;">
+        <div class="book-cover c2" style="width:100%; height:100%; border-radius:0;">
+          <div style="position:absolute; left:24px; right:24px; bottom:32px; z-index:1;">
+            <span class="pill gold" style="background:#fff;">EDITOR'S PICK</span>
+            <h1 class="title-serif" style="font-size:36px; color:#fff; line-height:1.15; margin:12px 0 4px;">Atomic Habits</h1>
+            <p style="font-size:16px; color:rgba(255,255,255,.85);">James Clear</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section" style="margin-top:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; background:#fff; border-radius:16px; box-shadow:0 8px 24px rgba(16,32,58,.04); border:1px solid var(--border);">
+          <div style="text-align:center;"><span style="display:block; font-size:12px; color:var(--text2); text-transform:uppercase; font-weight:700;">Rating</span><strong style="font-size:20px;">4.8★</strong></div>
+          <div style="width:1px; height:30px; background:var(--border);"></div>
+          <div style="text-align:center;"><span style="display:block; font-size:12px; color:var(--text2); text-transform:uppercase; font-weight:700;">Pages</span><strong style="font-size:20px;">320</strong></div>
+          <div style="width:1px; height:30px; background:var(--border);"></div>
+          <div style="text-align:center; cursor:pointer;" onclick="go('s-reviews')"><span style="display:block; font-size:12px; color:var(--text2); text-transform:uppercase; font-weight:700;">Reviews</span><strong style="font-size:20px;">12.4k</strong></div>
+        </div>
+      </div>
+
+      <div class="section chips">
+        <span class="pill soft">Productivity</span>
+        <span class="pill soft">Self-help</span>
+        <span class="pill soft">Bestseller</span>
+        <span class="pill soft">Offline available</span>
+      </div>
+      
+      <div class="section" style="display:flex; gap:12px;">
+        <button class="primary" onclick="go('s-reader')">Read Now</button>
+        <button class="secondary" style="width:60px; padding:0; display:flex; align-items:center; justify-content:center; font-size:20px;" onclick="showToast('Downloading...','success'); go('s-downloads');">⇩</button>
+      </div>
+      
+      <div class="section">
+        <h3 class="title-serif" style="font-size:22px; margin-bottom:12px;">Synopsis</h3>
+        <p class="subtle">No matter your goals, Atomic Habits offers a proven framework for improving--every day. James Clear reveals practical strategies that will teach you exactly how to form good habits, break bad ones, and master the tiny behaviors that lead to remarkable results.</p>
+      </div>
+
+      <div class="section list">
+        <button class="secondary" onclick="go('s-reviews')">View reviews and ratings</button>
+        <button class="secondary" onclick="go('s-community')">Request / vote for books</button>
+      </div>
+
+      <div class="section">
+        <h3 class="title-serif" style="font-size:22px; margin-bottom:16px;">You might also like</h3>
+        <div class="feature-row">
+          <div class="thumb lg book-cover c1" onclick="go('s-book-detail')"><div class="book-author">Cal Newport</div><div class="book-title">Deep Work</div></div>
+          <div class="thumb lg book-cover c4" onclick="go('s-book-detail')"><div class="book-author">Yuval Noah</div><div class="book-title">Sapiens</div></div>
+          <div class="thumb lg book-cover c9" onclick="go('s-book-detail')"><div class="book-author">Peter Thiel</div><div class="book-title">Zero to One</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="screen" id="s-reviews">
+    <div class="scroll">
+      <div class="topbar">
+        <button class="back" onclick="back()">←</button>
+        <h2>Reviews</h2>
+        <button class="ghost" style="border-radius:50%">★</button>
+      </div>
+      <div class="section card" style="padding:16px">
+        <div class="kpi" style="border:none;padding:0 0 16px 0; border-bottom:1px solid var(--border);">
+          <span><strong>4.8 out of 5</strong><br><span class="small">12,403 ratings</span></span><strong style="color:var(--gold);">★★★★★</strong>
+        </div>
+        <div class="review">
+          <div class="name">Aarav</div><div class="stars">★★★★★</div>
+          <div class="body">Clear, practical, and easy to finish. Good fit for an MVP reading app.</div>
+        </div>
+        <div class="review">
+          <div class="name">Neha</div><div class="stars">★★★★★</div>
+          <div class="body">The progress tracker and night mode are exactly the kind of features I expect.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- READER -->
+  <section class="screen reader" id="s-reader">
+    <div class="reader-top" style="background:linear-gradient(180deg, rgba(255,250,242,0.95), rgba(255,250,242,0.8) 70%, transparent);">
+      <button class="back" onclick="back()" aria-label="Back to book">←</button>
+      <div style="font-size:14px; font-weight:700; opacity:0.8;">Chapter 1 • Atomic Habits</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="back" onclick="showToast('Select text first, then use Highlight or Copy','gold')">✦</button>
+        <button class="back" onclick="go('s-reader-settings')">Aa</button>
+      </div>
+    </div>
+
+    <div class="reader-content" id="reader-content">
+      <div class="reader-pill" style="margin-bottom:20px;">Select any text to highlight or copy it</div>
+      <p><strong>We are all capable of change.</strong> The difference between success and failure is often the system around us, not the starting point.</p>
+      <p>Small habits compound. Tiny improvements repeated over time create results that look dramatic only in hindsight, which is why consistency matters more than intensity.</p>
+      <p>If you can get 1 percent better each day for one year, you'll end up thirty-seven times better by the time you're done. Conversely, if you get 1 percent worse each day for one year, you'll decline nearly down to zero.</p>
+      <p>What starts as a small win or a minor setback accumulates into something much more. Habits are the compound interest of self-improvement.</p>
+      <p>The same way that money multiplies through compound interest, the effects of your habits multiply as you repeat them. They seem to make little difference on any given day and yet the impact they deliver over the months and years can be enormous.</p>
+      <p>It is only when looking back two, five, or perhaps ten years later that the value of good habits and the cost of bad ones becomes strikingly apparent.</p>
+    </div>
+
+    <div class="selection-toolbar" id="reader-toolbar">
+      <button class="primary-tool" onclick="applyHighlight()">Highlight</button>
+      <button onclick="copySelectedText()">Copy</button>
+      <button onclick="clearSelectionHighlight()">Clear</button>
+    </div>
+
+    <div class="reader-bottom">
+      <div class="reader-progress-wrap">
+        <div class="reader-track"><div class="reader-fill" id="readerFill"></div></div>
+        <span class="small" id="readerPct">38%</span>
+      </div>
+      <div class="small" style="text-align:center">Page 48 of 126 · Drag to read more</div>
+    </div>
+  </section>
+
+  <!-- READER SETTINGS -->
+  <section class="screen overlay" id="s-reader-settings">
+    <div class="sheet settings-shell">
+      <div class="settings-nav">
+        <div class="settings-nav-title">Settings</div>
+        <button class="settings-nav-btn active" data-tab="appearance" onclick="switchReaderSettingsTab('appearance', this)">Appearance</button>
+        <button class="settings-nav-btn" data-tab="typography" onclick="switchReaderSettingsTab('typography', this)">Typography</button>
+        <button class="settings-nav-btn" data-tab="tools" onclick="switchReaderSettingsTab('tools', this)">Reading tools</button>
+      </div>
+
+      <div class="settings-panels">
+        <div class="settings-panel active" data-panel="appearance">
+          <div class="settings-inner">
+            <div class="topbar" style="padding:0 0 16px; margin:0;"><button class="back" onclick="go('s-reader')">←</button><h2 style="font-size:22px;">Appearance</h2><button class="ghost" style="border-radius:50%" onclick="go('s-reader')">✕</button></div>
+            <div class="section" style="margin:0 0 20px;"><div class="label">Background</div>
+              <div class="settings-row"><button class="theme-btn active" onclick="setReaderTheme('light', this)">Light</button><button class="theme-btn" onclick="setReaderTheme('warm', this)">Warm</button><button class="theme-btn" onclick="setReaderTheme('sepia', this)">Sepia</button><button class="theme-btn" onclick="setReaderTheme('night', this)">Night</button></div>
+            </div>
+            <div class="section" style="margin:0 0 20px;"><button class="primary" onclick="go('s-reader')">Apply and return</button></div>
+          </div>
+        </div>
+
+        <div class="settings-panel" data-panel="typography">
+          <div class="settings-inner">
+            <div class="topbar" style="padding:0 0 16px; margin:0;"><button class="back" onclick="go('s-reader')">←</button><h2 style="font-size:22px;">Typography</h2><button class="ghost" style="border-radius:50%" onclick="go('s-reader')">✕</button></div>
+            <div class="section" style="margin:0 0 20px;"><div class="label">Text size</div>
+              <div class="settings-row"><button class="font-btn" onclick="setFontSize('18px', this)">A−</button><button class="font-btn active" onclick="setFontSize('20px', this)">A</button><button class="font-btn" onclick="setFontSize('22px', this)">A+</button><button class="font-btn" onclick="setFontSize('24px', this)">A++</button></div>
+            </div>
+            <div class="section" style="margin:0 0 20px;"><button class="primary" onclick="go('s-reader')">Apply and return</button></div>
+          </div>
+        </div>
+
+        <div class="settings-panel" data-panel="tools">
+          <div class="settings-inner">
+            <div class="topbar" style="padding:0 0 16px; margin:0;"><button class="back" onclick="go('s-reader')">←</button><h2 style="font-size:22px;">Tools</h2><button class="ghost" style="border-radius:50%" onclick="go('s-reader')">✕</button></div>
+            <div class="section" style="margin:0 0 20px;"><div class="reader-tip">Highlight text to copy to clipboard.</div></div>
+            <div class="section" style="margin:0 0 20px;"><div class="settings-row"><button class="secondary" onclick="toast('Select text to highlight','gold')">Show hint</button></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section class="screen" id="s-downloads">
+    <div class="scroll">
+      <div class="topbar"><button class="back" onclick="back()">←</button><h2>Downloads</h2><button class="ghost" style="border-radius:50%">⇩</button></div>
+      <div class="section card" style="padding:16px">
+        <div class="kpi" style="border:none;padding:0 0 10px 0;"><span><strong>Storage used</strong><br><span class="small">1.2 GB of 4 GB</span></span><strong>34%</strong></div>
+        <div class="progress"><span style="width:34%"></span></div>
+      </div>
+      <div class="section list">
+        <div class="item card" onclick="go('s-offline')">
+          <div class="thumb book-cover c2"></div><div class="meta"><h4>Atomic Habits</h4><p>Downloaded • 100%</p></div><span class="pill success">Ready</span>
+        </div>
+        <div class="item card">
+          <div class="thumb book-cover c8"></div><div class="meta"><h4>Deep Work</h4><p>Downloading • 62%</p></div><span class="pill gold">62%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFLINE -->
+  <section class="screen" id="s-offline">
+    <div class="scroll">
+      <div class="topbar"><button class="back" onclick="back()">←</button><h2>Offline</h2><button class="ghost" style="border-radius:50%">↻</button></div>
+      <div class="section" style="text-align:center;padding-top:76px">
+        <div class="logo" style="margin:0 auto 14px;background:linear-gradient(135deg,#4caf82,#2a815f)">📶</div>
+        <h1 class="title-serif" style="font-size:28px">No internet</h1>
+        <p class="subtle" style="max-width:280px;margin:8px auto 0">Downloaded titles can still be opened.</p>
+      </div>
+      <div class="section list"><button class="primary" onclick="go('s-reader')">Continue reading</button><button class="secondary" onclick="go('s-downloads')">Back to downloads</button></div>
+    </div>
+  </section>
+
+  <!-- WISHLIST -->
+  <section class="screen" id="s-wishlist">
+    <div class="scroll">
+      <div class="topbar"><button class="back" onclick="back()">←</button><h2>Wishlist</h2><button class="ghost" style="border-radius:50%">♥</button></div>
+      <div class="section list">
+        <div class="item card" onclick="go('s-book-detail')">
+          <div class="thumb book-cover c7"></div><div class="meta"><h4>The Alchemist</h4><p>Saved yesterday</p></div><span class="pill coral">Saved</span>
+        </div>
+        <div class="item card" onclick="go('s-book-detail')">
+          <div class="thumb book-cover c14"></div><div class="meta"><h4>Project Hail Mary</h4><p>Saved last week</p></div><span class="pill coral">Saved</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section class="screen" id="s-community">
+    <div class="scroll">
+      <div class="topbar"><button class="back" onclick="back()">←</button><h2>Community</h2><button class="ghost" style="border-radius:50%">+</button></div>
+      <div class="section list">
+        <div class="vote card" style="padding:16px;">
+          <div><div class="title-serif" style="font-weight:800;font-size:15px;">Shoe Dog</div><div class="small">Requested by 182 users</div></div>
+          <button class="ghost" style="min-width:60px;min-height:36px;color:var(--success);border-color:rgba(76,175,130,.3)" onclick="showToast('Vote recorded','success')">↑ 182</button>
+        </div>
+        <div class="vote card" style="padding:16px;">
+          <div><div class="title-serif" style="font-weight:800;font-size:15px;">Thinking, Fast and Slow</div><div class="small">Requested by 147 users</div></div>
+          <button class="ghost" style="min-width:60px;min-height:36px;color:var(--success);border-color:rgba(76,175,130,.3)" onclick="showToast('Vote recorded','success')">↑ 147</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="s-profile">
+    <div class="scroll">
+      <div class="topbar"><button class="back" onclick="go('s-home')">←</button><h2>Profile</h2><button class="ghost" style="border-radius:50%" onclick="go('s-edit-profile')">⚙</button></div>
+      <div class="section" style="text-align:center">
+        <div class="logo" style="margin:0 auto 14px;width:84px;height:84px;font-size:34px">S</div>
+        <h1 class="title-serif" style="font-size:26px">Sachin Kumar</h1>
+        <p class="subtle">sachin@example.com</p>
+        <div style="height:10px"></div>
+        <span class="pill success">Annual plan active</span>
+      </div>
+      <div class="section">
+        <div class="mini-stats">
+          <div class="mini-stat card"><strong>14</strong><span>Day streak</span></div>
+          <div class="mini-stat card"><strong>23</strong><span>Books read</span></div>
+          <div class="mini-stat card"><strong>7</strong><span>Downloads</span></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h3>Achievements</h3></div>
+        <div class="chips">
+          <span class="chip active" style="border:none">7-day streak</span>
+          <span class="chip active" style="border:none">First download</span>
+          <span class="chip" style="border:none;background:rgba(255,255,255,.5)">Night reader</span>
+        </div>
+      </div>
+      <div class="section list">
+        <div class="item card" onclick="go('s-edit-profile')"><div class="meta"><h4>Edit profile</h4><p>Name, preferences</p></div><span>›</span></div>
+        <div class="item card" onclick="go('s-wishlist')"><div class="meta"><h4>Want to read</h4><p>Saved books</p></div><span>›</span></div>
+        <div class="item card" onclick="go('s-reader-settings')"><div class="meta"><h4>Reader settings</h4><p>Theme, font</p></div><span>›</span></div>
+        <div class="item card" onclick="go('s-community')"><div class="meta"><h4>Community votes</h4><p>Request titles</p></div><span>›</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDIT PROFILE -->
+  <section class="screen" id="s-edit-profile">
+    <div class="scroll">
+      <div class="topbar"><button class="back" onclick="back()">←</button><h2>Edit profile</h2><button class="ghost" style="border-radius:50%">✓</button></div>
+      <div class="section"><label class="label">Display name</label><input class="input" value="Sachin Kumar"></div>
+      <div class="section">
+        <label class="label">Reading preferences</label>
+        <div class="chips"><button class="chip active">Business</button><button class="chip active">Self-help</button><button class="chip">Science</button></div>
+      </div>
+      <div class="section"><button class="primary" onclick="showToast('Profile updated','success'); go('s-profile');">Save changes</button></div>
+    </div>
+  </section>
+
+  </div>
+</div>
+
+<script>
+let currentScreen = 's-splash';
+const historyStack = [];
+
+function toast(msg, type=''){
+  const root = document.getElementById('toast');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  root.appendChild(t);
+  requestAnimationFrame(()=> t.classList.add('show'));
+  setTimeout(()=>{
+    t.classList.remove('show');
+    setTimeout(()=> t.remove(), 260);
+  }, 2200);
+}
+function showToast(msg, type=''){ toast(msg, type); }
+
+function setDrawerOpenState(open){
+  const drawer = document.getElementById('drawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  if (drawer) drawer.classList.toggle('open', open);
+  if (backdrop) backdrop.classList.toggle('show', open);
+}
+function toggleDrawer(){
+  const drawer = document.getElementById('drawer');
+  setDrawerOpenState(!(drawer && drawer.classList.contains('open')));
+}
+function closeDrawer(){ setDrawerOpenState(false); }
+
+function setSiteTheme(theme, btn){
+  const frame = document.querySelector('.frame');
+  if (!frame) return;
+  frame.dataset.theme = theme;
+  document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  toast(`Theme set to ${theme}`, 'success');
+}
+
+function updateReaderProgress(){
+  const fill = document.getElementById('readerFill');
+  const pct = document.getElementById('readerPct');
+  const reader = document.getElementById('reader-content');
+  if (!fill || !pct || !reader) return;
+  const progress = Math.min(100, Math.max(12, Math.round((reader.scrollTop / Math.max(1, (reader.scrollHeight - reader.clientHeight))) * 100)));
+  fill.style.width = progress + '%';
+  pct.textContent = progress + '%';
+}
+
+function go(id, push=true){
+  const next = document.getElementById(id);
+  const prev = document.getElementById(currentScreen);
+  if (!next || next === prev) return;
+  
+  if (push) historyStack.push(currentScreen);
+  if (prev) {
+    prev.classList.add('exit-left');
+    prev.classList.remove('active');
+    setTimeout(() => prev.classList.remove('exit-left'), 280);
+  }
+  next.classList.add('active');
+  currentScreen = id;
+
+  if (id === 's-reader') {
+    updateReaderProgress();
+    hideSelectionToolbar();
+  }
+  if (id === 's-reader-settings') {
+    switchReaderSettingsTab('appearance');
+  }
+}
+
+function back(){
+  const id = historyStack.pop() || 's-home';
+  go(id, false);
+}
+
+function setReaderTheme(mode, el){
+  const reader = document.getElementById('s-reader');
+  if (!reader) return;
+  reader.style.setProperty('--reader', mode === 'night' ? '#1b1413' : mode === 'sepia' ? '#ead9b6' : mode === 'warm' ? '#fff2dd' : '#fffaf2');
+  reader.style.setProperty('--readerText', mode === 'night' ? '#f4e8d8' : mode === 'sepia' ? '#3d2b1a' : '#23140f');
+  document.querySelectorAll('#s-reader-settings .theme-btn').forEach(btn => btn.classList.remove('active'));
+  if (el) el.classList.add('active');
+  toast(`Background updated`, 'gold');
+}
+
+function setFontSize(size, el){
+  const reader = document.getElementById('reader-content');
+  if (!reader) return;
+  reader.style.fontSize = size;
+  document.querySelectorAll('#s-reader-settings .font-btn').forEach(btn => btn.classList.remove('active'));
+  if (el) el.classList.add('active');
+  toast(`Text size set`, 'success');
+}
+
+function switchReaderSettingsTab(tab, el){
+  document.querySelectorAll('#s-reader-settings .settings-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.dataset.panel === tab);
+  });
+  document.querySelectorAll('#s-reader-settings .settings-nav-btn').forEach(btn => btn.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+function getReaderSelection(){
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return null;
+  const reader = document.getElementById('reader-content');
+  if (!reader) return null;
+  const range = sel.getRangeAt(0);
+  if (!reader.contains(range.commonAncestorContainer)) return null;
+  return sel;
+}
+
+function showSelectionToolbar(){
+  const toolbar = document.getElementById('reader-toolbar');
+  if (!toolbar) return;
+  toolbar.style.display = 'flex';
+}
+function hideSelectionToolbar(){
+  const toolbar = document.getElementById('reader-toolbar');
+  if (!toolbar) return;
+  toolbar.style.display = 'none';
+}
+function updateSelectionToolbar(){
+  const sel = getReaderSelection();
+  if (!sel) { hideSelectionToolbar(); return; }
+  showSelectionToolbar();
+}
+
+function applyHighlight(){
+  const sel = getReaderSelection();
+  if (!sel) return toast('Select text first', 'gold');
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.className = 'highlighted-text';
+  try {
+    range.surroundContents(span);
+  } catch (e) {
+    const contents = range.extractContents();
+    span.appendChild(contents);
+    range.insertNode(span);
+  }
+  sel.removeAllRanges();
+  toast('Highlighted', 'success');
+  hideSelectionToolbar();
+}
+
+async function copySelectedText(){
+  const sel = getReaderSelection();
+  if (!sel) return;
+  try {
+    await navigator.clipboard.writeText(sel.toString().trim());
+    toast('Copied', 'success');
+  } catch (e) { toast('Copy failed', 'danger'); }
+}
+
+function clearSelectionHighlight(){
+  const reader = document.getElementById('reader-content');
+  if (!reader) return;
+  const spans = reader.querySelectorAll('.highlighted-text');
+  if (!spans.length) return toast('No highlights', 'gold');
+  spans.forEach(span => {
+    const parent = span.parentNode;
+    while (span.firstChild) parent.insertBefore(span.firstChild, span);
+    parent.removeChild(span);
+    parent.normalize();
+  });
+  toast('Highlights cleared', 'success');
+}
+
+document.addEventListener('selectionchange', () => { if (currentScreen === 's-reader') updateSelectionToolbar(); });
+document.addEventListener('mouseup', () => { if (currentScreen === 's-reader') updateSelectionToolbar(); });
+
+const readerContent = document.getElementById('reader-content');
+if (readerContent) {
+  readerContent.addEventListener('scroll', updateReaderProgress);
+}
+
+// Drawer accordion logic
+document.querySelectorAll('.drawer-group > summary').forEach(summary => {
+  summary.addEventListener('click', () => {
+    const details = summary.parentElement;
+    setTimeout(() => {
+      Array.from(details.parentElement.children).forEach(child => {
+        if (child !== details && child.tagName === 'DETAILS') child.open = false;
+      });
+    }, 0);
+  });
+});
+
+setTimeout(() => {
+  if (currentScreen === 's-splash') go('s-welcome-social');
+}, 1800);
+</script>
+
+</body>
+</html>
