@@ -3,116 +3,98 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PageTurn — High-Fidelity Prototype v10</title>
+<title>PageTurn — High-Fidelity Prototype v11 (Complete)</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#faf8f5; --surface:#ffffff; --border:#e2dcd0; --text:#0f172a; --text2:#334155; --text3:#64748b;
-  --gold:#d97706; --coral:#c25e3e; --success:#10b981;
+  --gold:#d97706; --coral:#c25e3e; --success:#10b981; --danger:#ef4444;
   --reader:#fffaf2; --readerText:#1e293b; --dark-bg: #111827; --dark-surface: #1f2937;
   scroll-behavior:smooth;
 }
-
 *{box-sizing:border-box;margin:0;padding:0}
 html, body{width:100%;height:100%;background:var(--bg);font-family:'Inter',sans-serif;overflow:hidden;color:var(--text);font-size:16px;}
-button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoration:none}
-
-.frame{width:100vw; height:100vh; background:var(--bg); display:flex; position:relative; overflow:hidden;}
+button,input{font:inherit; outline:none;} button{cursor:pointer} a{color:inherit;text-decoration:none}
+.frame{width:100vw; height:100vh; display:flex; position:relative; overflow:hidden;}
 .main-panel{flex:1; min-width:0; position:relative; background:var(--bg);}
 
-/* Global Navigation */
-.global-nav{position:fixed; top:20px; left:20px; right:20px; z-index:90; display:flex; justify-content:space-between; align-items:flex-start; pointer-events:none;}
+/* Global Nav */
+.global-nav{position:fixed; top:20px; left:20px; right:20px; z-index:90; display:flex; justify-content:space-between; pointer-events:none;}
 .nav-left, .nav-right{display:flex; gap:12px; pointer-events:auto; align-items:center;}
-
-.nav-btn{
-  width:48px; height:48px; border-radius:12px; border:1px solid rgba(0,0,0,.1);
-  background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.08); font-size:24px; color:var(--text);
-  display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.2s;
-}
+.nav-btn{width:48px;height:48px;border-radius:12px;border:1px solid rgba(0,0,0,.1);background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:24px;color:var(--text);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;}
 .nav-btn:hover{transform:scale(1.05);}
-.top-desktop-pill{background:#fff; border:1px solid var(--border); color:var(--text2); padding:12px 20px; border-radius:999px; font-size:14px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,.05);}
+.top-desktop-pill{background:#fff;border:1px solid var(--border);color:var(--text2);padding:12px 20px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.05);}
 
-/* Toasts */
+/* Toast */
 #toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;align-items:center;z-index:9999;pointer-events:none;width:340px;}
 .toast{opacity:0;transform:translateY(10px);transition:all .25s ease;background:rgba(15,23,42,.95);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);padding:14px 20px;border-radius:12px;color:#fff;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center;}
 .toast.show{opacity:1;transform:translateY(0)}
 
 /* Screens */
-.screen{position:absolute;inset:0;opacity:0;transform:translateX(20px);pointer-events:none;transition:opacity .3s ease,transform .3s ease;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.screen{position:absolute;inset:0;opacity:0;transform:translateX(20px);pointer-events:none;transition:opacity .3s,transform .3s;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
 .screen.active{opacity:1;transform:translateX(0);pointer-events:auto;}
 .screen.exit-left{opacity:0;transform:translateX(-20px)}
 .scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
 .scroll::-webkit-scrollbar{display:none}
+.topbar{padding:100px 24px 24px; display:flex; align-items:center;}
 
-/* Typography & Components */
+/* Typography & Base */
 .title-serif{font-family:'Playfair Display',serif;color:var(--text);font-weight:800;}
 .subtle{color:var(--text2);font-size:15px;line-height:1.6;}
-
-.primary, .secondary{width:100%;min-height:56px;border:none;border-radius:12px;font-size:16px;font-weight:700;transition:transform .2s ease; cursor:pointer;}
+.primary, .secondary{width:100%;min-height:56px;border:none;border-radius:12px;font-size:16px;font-weight:700;transition:transform .2s; display:flex; align-items:center; justify-content:center; gap:8px;}
 .primary{background:var(--coral);color:#fff;box-shadow:0 8px 20px rgba(194,94,62,.3);}
 .primary:active{transform:scale(0.98);}
 .secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,.04);}
-
 .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;}
-.pill.success{background:rgba(16,185,129,.15);color:#047857;border:1px solid rgba(16,185,129,.3)}
-.pill.gold{background:#fff;color:var(--gold);border:1px solid var(--border)}
-.pill.coral{background:rgba(194,94,62,.15);color:var(--coral);border:1px solid rgba(194,94,62,.3)}
-
+.pill.success{background:rgba(16,185,129,.15);color:#047857;} .pill.gold{background:#fff;color:var(--gold);border:1px solid var(--border)}
 .card{background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,.04);}
-.input{width:100%;min-height:56px;padding:16px;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:12px;font-size:16px;outline:none;}
+.input{width:100%;min-height:56px;padding:16px;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:12px;font-size:16px;}
 .input:focus{border-color:var(--coral);}
 .label{display:block;margin-bottom:8px;font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;}
 
-/* Layout Rows */
+/* Layouts */
 .section{margin:0 24px 40px;}
 .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;}
 .section-head h3{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;}
-.feature-row{display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding:4px 4px 20px 4px;}
+.feature-row{display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding:4px 4px 20px 4px;overscroll-behavior-x:contain; scroll-snap-type: x mandatory;}
+.feature-row::-webkit-scrollbar{display:none}
 
-/* Book Covers */
-.book-cover{position:relative;overflow:hidden;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.15);transition:transform .3s ease;cursor:pointer;background-size:cover;background-position:center;background-color:var(--dark-bg);}
+/* Covers */
+.book-cover{position:relative;overflow:hidden;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.15);transition:transform .3s;cursor:pointer;background-size:cover;background-position:center;background-color:var(--dark-bg);scroll-snap-align:start;}
 .book-cover:hover{transform:translateY(-8px);}
 .book-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.9));border-radius:inherit;}
 .book-title{position:absolute;left:14px;right:14px;bottom:14px;z-index:1;font-size:15px;font-weight:800;color:#fff;line-height:1.2;}
 .book-author{position:absolute;left:14px;right:14px;bottom:36px;z-index:1;font-size:12px;color:rgba(255,255,255,.8);font-weight:600;}
 .thumb.sm{width:70px;height:100px;flex:0 0 auto;border-radius:8px;}
-.thumb.lg{width:160px;height:240px;flex:0 0 auto;border-radius:12px;}
-
-/* Search */
-.search-box{margin:0 24px 24px;padding:16px 20px;border-radius:16px;border:2px solid var(--gold);background:var(--surface);display:flex;align-items:center;gap:14px;}
-.search-box input{flex:1;background:none;border:none;outline:none;font-size:18px;font-weight:500;}
-.filter-bar{padding:0 24px 24px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;}
-.chips{display:flex;gap:12px;flex-wrap:wrap;}
-.chip{border:none;border-radius:999px;padding:10px 20px;background:var(--surface);color:var(--text2);border:1px solid var(--border);font-size:14px;font-weight:700;cursor:pointer;}
-.chip.active{background:var(--coral);color:#fff;border-color:var(--coral);}
+.thumb.lg{width:160px;height:240px;flex:0 0 auto;}
 
 /* Drawer */
-.drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:95;}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:95;}
 .drawer-backdrop.show{opacity:1;pointer-events:auto;}
 .drawer{position:fixed;top:0;left:0;bottom:0;width:min(360px,calc(100vw - 40px));background:var(--surface);border-right:1px solid var(--border);transform:translateX(-100%);transition:transform .3s;z-index:100;padding:24px;overflow-y:auto;}
 .drawer.open{transform:translateX(0)}
 .drawer-nav-item{width:100%;text-align:left;padding:16px;border-radius:12px;border:none;background:var(--bg);font-size:16px;font-weight:700;color:var(--text);cursor:pointer;margin-bottom:8px;}
-.drawer-nav-item:hover{background:var(--border);}
 
-/* Reader */
-.reader{background:var(--reader);color:var(--readerText);}
-.reader-content{padding:80px 48px 136px;font-family:'Lora',serif;font-size:20px;line-height:2.05;max-width:800px;margin:0 auto;height:100%;overflow-y:auto;}
-.reader-content p{margin-bottom:22px}
-.paywall-blur{position:relative;}
-.paywall-blur::after{content:'';position:absolute;bottom:0;left:0;right:0;height:250px;background:linear-gradient(180deg, transparent, var(--reader));pointer-events:none;}
-.paywall-box{text-align:center;padding:40px 24px;background:var(--surface);border:1px solid var(--gold);border-radius:16px;margin:40px auto;max-width:600px;box-shadow:0 10px 30px rgba(217,119,6,.1);}
-
-/* Lists */
-.list-item{display:flex;align-items:center;gap:16px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;cursor:pointer;}
-.footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:14px;border-top:1px solid var(--border);margin-top:40px;}
-
-/* Specific Screen Overrides for Accuracy */
+/* Specifics */
 .detail-hero{position:absolute;top:0;left:0;right:0;height:450px;background:linear-gradient(180deg, #334155, #0f172a);z-index:0;}
+.reader{background:var(--reader);color:var(--readerText);}
+.reader-content{padding:80px 48px 136px;font-family:'Lora',serif;font-size:20px;line-height:2.05;max-width:800px;margin:0 auto;}
+.paywall-blur{position:relative;} .paywall-blur::after{content:'';position:absolute;bottom:0;left:0;right:0;height:250px;background:linear-gradient(180deg, transparent, var(--reader));pointer-events:none;}
+.list-item{display:flex;align-items:center;gap:16px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;cursor:pointer;}
+.chips{display:flex;gap:12px;flex-wrap:wrap;}
+.chip{border:none;border-radius:999px;padding:10px 20px;background:var(--surface);color:var(--text2);border:1px solid var(--border);font-size:14px;font-weight:700;cursor:pointer;}
+.chip.active{background:var(--coral);color:#fff;border-color:var(--coral);}
+
+/* Overlay Settings (Restored v7) */
+.overlay-sheet{position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-radius:32px 32px 0 0; padding:24px; box-shadow:0 -10px 40px rgba(0,0,0,.1); z-index:90; transform:translateY(100%); transition:transform 0.3s; display:flex; flex-direction:column; max-height:80vh;}
+.overlay-sheet.show{transform:translateY(0);}
+.settings-row{display:flex; gap:12px; margin-bottom:24px;}
+.settings-btn{flex:1; padding:16px; border-radius:12px; border:1px solid var(--border); background:var(--bg); font-weight:700; cursor:pointer;}
+.settings-btn.active{border-color:var(--gold); color:var(--gold); background:#fff;}
 </style>
 </head>
 <body>
 
-<!-- Global Navigation -->
 <div class="global-nav">
   <div class="nav-left">
     <button class="nav-btn" id="btn-hamburger" onclick="toggleDrawer()">☰</button>
@@ -121,6 +103,7 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
   </div>
   <div class="nav-right">
     <button class="nav-btn" id="btn-heart" onclick="toggleWishlist()" style="display:none; color:var(--text);">♡</button>
+    <button class="nav-btn" id="btn-settings" onclick="toggleReaderSettings()" style="display:none;">Aa</button>
   </div>
 </div>
 
@@ -135,9 +118,31 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
     <button class="drawer-nav-item" onclick="go('s-search'); closeDrawer()">🔍 Search</button>
     <button class="drawer-nav-item" onclick="go('s-wishlist'); closeDrawer()">♥ Wishlist</button>
     <button class="drawer-nav-item" onclick="go('s-downloads'); closeDrawer()">⬇ Downloads</button>
+    <button class="drawer-nav-item" onclick="go('s-community'); closeDrawer()">💬 Community</button>
     <button class="drawer-nav-item" onclick="go('s-profile'); closeDrawer()">⚙ Profile & Settings</button>
   </div>
 </aside>
+
+<!-- Restored Reader Settings Overlay -->
+<div class="overlay-sheet" id="readerSettings">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <h3 class="title-serif" style="font-size:24px;">Reader Settings</h3>
+    <button onclick="toggleReaderSettings()" style="border:none;background:transparent;font-size:24px;">✕</button>
+  </div>
+  <div class="label">Background Theme</div>
+  <div class="settings-row">
+    <button class="settings-btn active" onclick="setReaderTheme('light', this)">Light</button>
+    <button class="settings-btn" onclick="setReaderTheme('sepia', this)">Sepia</button>
+    <button class="settings-btn" onclick="setReaderTheme('dark', this)">Dark</button>
+  </div>
+  <div class="label">Typography Size</div>
+  <div class="settings-row">
+    <button class="settings-btn" onclick="setFontSize('18px', this)">A-</button>
+    <button class="settings-btn active" onclick="setFontSize('20px', this)">A</button>
+    <button class="settings-btn" onclick="setFontSize('24px', this)">A+</button>
+  </div>
+  <button class="primary" onclick="toggleReaderSettings()">Apply & Return</button>
+</div>
 
 <div class="frame">
   <div id="toast"></div>
@@ -146,9 +151,9 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
   <!-- SPLASH -->
   <section class="screen active" id="s-splash">
     <div class="scroll" style="display:flex; align-items:center; justify-content:center; background:#0f172a;">
-      <div style="text-align:center; color:#fff;">
+      <div style="text-align:center; color:#fff;" onclick="go('s-welcome-social')">
         <h1 class="title-serif" style="font-size:48px;">PageTurn</h1>
-        <p style="color:#94a3b8; letter-spacing:2px; text-transform:uppercase; font-size:12px; margin-top:8px;">Loading Library...</p>
+        <p style="color:#94a3b8; letter-spacing:2px; text-transform:uppercase; font-size:12px; margin-top:8px;">Tap to begin</p>
       </div>
     </div>
   </section>
@@ -157,21 +162,15 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
   <section class="screen" id="s-welcome-social">
     <div class="scroll">
       <div style="padding:120px 24px 40px; max-width:800px; margin:0 auto;">
-        <span class="pill success" style="margin-bottom:24px; background:#d1fae5; color:#047857; border:none;">JOIN 2,000,000+ READERS</span>
+        <span class="pill success" style="margin-bottom:24px;">JOIN 2,000,000+ READERS</span>
         <h1 class="title-serif" style="font-size:48px; line-height:1.1; margin-bottom:16px;">Find your next book.<br>Keep reading every day.</h1>
         <p class="subtle" style="font-size:18px; margin-bottom:48px;">Unlimited access to thousands of audiobooks, ebooks, and more. Netflix for books.</p>
         
         <div style="display:flex; gap:16px; margin-bottom:48px;">
-          <div class="card" style="flex:1; padding:24px; text-align:center;">
-            <strong style="display:block; font-size:24px; font-family:'Playfair Display',serif;">50K+</strong>
-            <span style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase;">Books</span>
-          </div>
-          <div class="card" style="flex:1; padding:24px; text-align:center;">
-            <strong style="display:block; font-size:24px; font-family:'Playfair Display',serif;">4.8★</strong>
-            <span style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase;">Avg Rating</span>
-          </div>
+          <div class="card" style="flex:1; padding:24px; text-align:center;"><strong style="display:block; font-size:24px;">50K+</strong><span class="label">Books</span></div>
+          <div class="card" style="flex:1; padding:24px; text-align:center;"><strong style="display:block; font-size:24px;">4.8★</strong><span class="label">Rating</span></div>
         </div>
-        <button class="primary" onclick="go('s-signup')">Sign in with Email</button>
+        <button class="primary" onclick="go('s-signup')">Continue with Email</button>
         <div style="height:16px;"></div>
         <button class="secondary" onclick="loginGuest()">Browse as Guest (Sample Mode)</button>
       </div>
@@ -192,20 +191,34 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
     </div>
   </section>
 
-  <!-- SIGNUP / LOGIN -->
+  <!-- SIGNUP -->
   <section class="screen" id="s-signup">
     <div class="scroll">
       <div style="padding:120px 24px; max-width:600px; margin:0 auto;">
         <h1 class="title-serif" style="font-size:36px; margin-bottom:32px;">Welcome Back</h1>
-        <div style="margin-bottom:20px;">
-          <label class="label">Email Address</label>
-          <input class="input" value="sachin@example.com">
+        <div style="margin-bottom:20px;"><label class="label">Email Address</label><input class="input" value="sachin@example.com"></div>
+        <div style="margin-bottom:32px;"><label class="label">Password</label><input class="input" type="password" value="password123"></div>
+        <button class="primary" onclick="go('s-otp')">Sign In</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- OTP (Restored) -->
+  <section class="screen" id="s-otp">
+    <div class="scroll">
+      <div style="padding:120px 24px; max-width:600px; margin:0 auto; text-align:center;">
+        <div style="font-size:48px; margin-bottom:16px;">📬</div>
+        <h1 class="title-serif" style="font-size:36px; margin-bottom:16px;">Check your inbox</h1>
+        <p class="subtle" style="margin-bottom:32px;">We sent a 6-digit code to verify your identity.</p>
+        <div style="display:flex; justify-content:center; gap:8px; margin-bottom:32px;">
+          <div class="input" style="width:48px; padding:16px 0; text-align:center; font-size:24px; color:var(--gold); border-color:var(--gold);">3</div>
+          <div class="input" style="width:48px; padding:16px 0; text-align:center; font-size:24px; color:var(--gold); border-color:var(--gold);">7</div>
+          <div class="input" style="width:48px; padding:16px 0; text-align:center; font-size:24px; color:var(--gold); border-color:var(--gold);">4</div>
+          <div class="input" style="width:48px; padding:16px 0; text-align:center; font-size:24px; color:var(--gold); border-color:var(--gold);">8</div>
+          <div class="input" style="width:48px; padding:16px 0; text-align:center; font-size:24px;">_</div>
+          <div class="input" style="width:48px; padding:16px 0; text-align:center; font-size:24px;"></div>
         </div>
-        <div style="margin-bottom:32px;">
-          <label class="label">Password</label>
-          <input class="input" type="password" value="password123">
-        </div>
-        <button class="primary" onclick="executeLogin()">Sign In & View Library</button>
+        <button class="primary" onclick="executeLogin()">Verify and Continue</button>
       </div>
     </div>
   </section>
@@ -244,7 +257,6 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
         <h1 class="title-serif" style="font-size:32px; margin-bottom:24px;">Payment Details</h1>
         <div class="card" style="padding:16px; margin-bottom:24px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Annual Plan</span><strong>₹9,588</strong></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--success);"><span>Discount</span><strong>−₹3,996</strong></div>
           <div style="display:flex; justify-content:space-between; padding-top:8px; border-top:1px solid var(--border);"><span>Total Today</span><strong style="color:var(--gold)">₹5,992</strong></div>
         </div>
         <div style="margin-bottom:16px;"><label class="label">Card number</label><input class="input" value="4242 4242 4242 4242"></div>
@@ -252,7 +264,8 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
           <div style="flex:1;"><label class="label">Expiry</label><input class="input" value="12 / 27"></div>
           <div style="flex:1;"><label class="label">CVV</label><input class="input" value="•••"></div>
         </div>
-        <button class="primary" style="background:var(--gold);" onclick="processPayment()">🔒 Pay ₹5,992</button>
+        <button class="primary" style="background:var(--gold); margin-bottom:16px;" onclick="processPayment()">🔒 Pay ₹5,992</button>
+        <button class="secondary" onclick="go('s-payment-failed')">Test Payment Failure</button>
       </div>
     </div>
   </section>
@@ -260,35 +273,31 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
   <!-- PAYMENT MONTHLY -->
   <section class="screen" id="s-payment-monthly">
     <div class="scroll">
-      <div style="padding:100px 24px; max-width:600px; margin:0 auto;">
-        <h1 class="title-serif" style="font-size:32px; margin-bottom:24px;">Payment Details</h1>
-        <div class="card" style="padding:16px; margin-bottom:24px;">
-          <div style="display:flex; justify-content:space-between;"><span>Monthly Plan</span><strong>₹1,199</strong></div>
-        </div>
-        <button class="primary" style="background:var(--gold);" onclick="processPayment()">🔒 Pay ₹1,199</button>
+      <div style="padding:100px 24px; max-width:600px; margin:0 auto;"><h1 class="title-serif" style="font-size:32px; margin-bottom:24px;">Payment Details</h1><button class="primary" style="background:var(--gold);" onclick="processPayment()">🔒 Pay ₹1,199</button></div>
+    </div>
+  </section>
+
+  <!-- PAYMENT FAILED (Restored) -->
+  <section class="screen" id="s-payment-failed">
+    <div class="scroll">
+      <div style="padding:120px 24px; max-width:600px; margin:0 auto; text-align:center;">
+        <div style="font-size:48px; margin-bottom:16px;">✖️</div>
+        <h1 class="title-serif" style="font-size:36px; margin-bottom:16px;">Transaction Declined</h1>
+        <p class="subtle" style="margin-bottom:32px;">Please check your card details or try a different payment method.</p>
+        <button class="primary" onclick="back()">Retry Payment</button>
+        <div style="height:12px;"></div>
+        <button class="secondary" onclick="go('s-home')">Skip for now</button>
       </div>
     </div>
   </section>
 
-  <!-- HOME -->
+  <!-- HOME (Netflix Rows) -->
   <section class="screen" id="s-home">
     <div class="scroll" style="padding-top:100px;">
-      <div class="section" id="home-greeting">
-        <!-- JS injected greeting -->
-      </div>
-      <div class="section">
-        <div class="section-head"><h3 class="title-serif">Continue Reading</h3></div>
-        <div class="feature-row" id="row-continue"></div>
-      </div>
-      <div class="section">
-        <div class="section-head"><h3 class="title-serif">Trending Now 🔥</h3></div>
-        <div class="feature-row" id="row-trending"></div>
-      </div>
-      <!-- Personalization based on User Summary -->
-      <div class="section">
-        <div class="section-head"><h3 class="title-serif">Risk & HSE Strategies</h3></div>
-        <div class="feature-row" id="row-business"></div>
-      </div>
+      <div class="section" id="home-greeting"></div>
+      <div class="section"><div class="section-head"><h3 class="title-serif">Continue Reading</h3></div><div class="feature-row" id="row-continue"></div></div>
+      <div class="section"><div class="section-head"><h3 class="title-serif">Trending Now 🔥</h3><button class="link" onclick="go('s-search')">Explore</button></div><div class="feature-row" id="row-trending"></div></div>
+      <div class="section"><div class="section-head"><h3 class="title-serif">Business & Strategy</h3><button class="link" onclick="go('s-search')">Explore</button></div><div class="feature-row" id="row-business"></div></div>
       <div class="footer"><p>PageTurn Library &copy; 2026</p></div>
     </div>
   </section>
@@ -297,18 +306,9 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
   <section class="screen" id="s-search">
     <div class="scroll" style="background:var(--dark-bg); color:#f8fafc; padding-top:100px;">
       <div style="padding:0 24px 24px; text-align:center;"><h2 class="title-serif" style="color:#fff; font-size:32px;">Search</h2></div>
-      <div class="search-box" style="border-color:var(--gold);">
-        <span style="font-size:20px;">🔍</span>
-        <input placeholder="Search books, authors..." id="search-input" style="color:var(--text);" onkeyup="handleSearch(this.value)">
-      </div>
-      <div class="filter-bar">
-        <button class="chip active">Popular</button><button class="chip">Genres</button><button class="chip">Author</button><button class="chip">Rating</button>
-      </div>
-      <div class="section" style="margin-top:24px;">
-        <h3 class="title-serif" style="font-size:20px; color:#fff; margin-bottom:16px;">Browse All</h3>
-        <div id="search-results" style="display:flex; flex-direction:column; gap:12px;"></div>
-      </div>
-      <div class="footer" style="border-top:1px solid #334155; color:#94a3b8;"><p>End of search results.</p></div>
+      <div class="search-box" style="border-color:var(--gold);"><span style="font-size:20px;">🔍</span><input placeholder="Search books, authors..." id="search-input" style="color:var(--text);" onkeyup="handleSearch(this.value)"></div>
+      <div class="filter-bar"><button class="chip active">Popular</button><button class="chip">Genres</button><button class="chip">Author</button></div>
+      <div class="section" style="margin-top:24px;"><h3 class="title-serif" style="font-size:20px; color:#fff; margin-bottom:16px;">Browse All</h3><div id="search-results" style="display:flex; flex-direction:column; gap:12px;"></div></div>
     </div>
   </section>
 
@@ -321,10 +321,7 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
         <h1 class="title-serif" id="det-title" style="font-size:42px; color:#fff; line-height:1.1; margin-bottom:12px;">Title</h1>
         <p id="det-author" style="font-size:18px; color:rgba(255,255,255,.8);">Author</p>
       </div>
-      
-      <!-- Overlapping Content Area -->
       <div style="background:var(--bg); border-radius:32px 32px 0 0; padding:0 24px 60px 24px; min-height:600px; margin-top:20px;">
-        
         <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:20px; margin-top:-40px; position:relative; z-index:20;">
           <div style="text-align:center; flex:1;"><span class="label" style="font-size:11px; margin-bottom:4px;">Rating</span><strong style="font-size:22px; font-weight:800;" id="det-rating">4.8★</strong></div>
           <div style="width:1px; height:40px; background:var(--border);"></div>
@@ -332,15 +329,12 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
           <div style="width:1px; height:40px; background:var(--border);"></div>
           <div style="text-align:center; flex:1; cursor:pointer;" onclick="go('s-reviews')"><span class="label" style="font-size:11px; margin-bottom:4px;">Reviews</span><strong style="font-size:22px; font-weight:800;">12.4k</strong></div>
         </div>
-
         <div style="margin-top:32px;"><button class="primary" onclick="go('s-reader')">Read Now</button></div>
-        
         <div class="card" style="margin-top:32px; background:var(--dark-surface); padding:24px; border:none; color:#fff;">
           <h3 class="title-serif" style="font-size:24px; margin-bottom:16px; color:#fff;">Synopsis</h3>
-          <p id="det-synopsis" style="color:#cbd5e1; font-size:15px; line-height:1.7; margin-bottom:24px;">Synopsis text goes here.</p>
+          <p id="det-synopsis" style="color:#cbd5e1; font-size:15px; line-height:1.7; margin-bottom:24px;"></p>
           <button class="secondary" style="background:#fff; color:#0f172a; margin-bottom:12px; border:none;" onclick="go('s-reviews')">View Reviews</button>
         </div>
-
         <div class="section" style="margin:40px -24px 0 -24px; padding:0 24px;">
           <h3 class="title-serif" style="font-size:24px; margin-bottom:20px;">You might also like</h3>
           <div class="feature-row" id="det-related"></div>
@@ -353,23 +347,15 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
   <section class="screen" id="s-reviews">
     <div class="scroll" style="padding-top:100px;">
       <div class="section">
-        <h2 class="title-serif" style="font-size:32px; margin-bottom:24px;">Reviews & Ratings</h2>
+        <h2 class="title-serif" style="font-size:32px; margin-bottom:24px;">Reviews</h2>
         <div class="card" style="padding:24px; text-align:center; margin-bottom:24px;">
           <strong style="font-size:48px; font-weight:800; display:block;">4.8</strong>
-          <div style="color:var(--gold); font-size:24px; letter-spacing:2px; margin-bottom:8px;">★★★★★</div>
+          <div style="color:var(--gold); font-size:24px; margin-bottom:8px;">★★★★★</div>
           <span class="subtle">Based on 12,403 ratings</span>
         </div>
         <button class="primary" style="margin-bottom:32px;" onclick="showToast('Review submitted','success')">Write a Review</button>
-        
         <div style="display:flex; flex-direction:column; gap:16px;">
-          <div class="card" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><strong>Aarav</strong><span style="color:var(--gold);">★★★★★</span></div>
-            <p class="subtle">Clear, practical, and easy to finish. The concepts are immediately applicable.</p>
-          </div>
-          <div class="card" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><strong>Neha</strong><span style="color:var(--gold);">★★★★☆</span></div>
-            <p class="subtle">Excellent read. The progress tracking feature in this app makes finishing it much easier.</p>
-          </div>
+          <div class="card" style="padding:20px;"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><strong>Aarav</strong><span style="color:var(--gold);">★★★★★</span></div><p class="subtle">Clear, practical, and easy to finish.</p></div>
         </div>
       </div>
     </div>
@@ -378,12 +364,8 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
   <!-- READER -->
   <section class="screen reader" id="s-reader">
     <div class="scroll" style="padding-top:100px;">
-      <div style="text-align:center; margin-bottom:40px; padding:0 24px;">
-        <h2 class="title-serif" id="rd-title" style="font-size:28px;">Title</h2>
-        <p id="rd-author" class="subtle">Author</p>
-      </div>
+      <div style="text-align:center; margin-bottom:40px; padding:0 24px;"><h2 class="title-serif" id="rd-title" style="font-size:28px;">Title</h2><p id="rd-author" class="subtle">Author</p></div>
       <div class="reader-content" id="reader-content"></div>
-      
       <!-- Paywall -->
       <div id="paywall-section" style="display:none; padding:0 24px;">
         <div class="paywall-box">
@@ -396,7 +378,7 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
     </div>
   </section>
 
-  <!-- DOWNLOADS -->
+  <!-- DOWNLOADS & OFFLINE (Restored) -->
   <section class="screen" id="s-downloads">
     <div class="scroll" style="padding-top:100px;">
       <div class="section">
@@ -404,10 +386,9 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
         <div class="card" style="padding:20px; margin-bottom:24px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><span>Storage Used</span><strong>34%</strong></div>
           <div style="height:8px; background:var(--border); border-radius:4px; overflow:hidden;"><div style="width:34%; height:100%; background:var(--success);"></div></div>
-          <p class="subtle" style="font-size:12px; margin-top:8px;">1.2 GB of 4 GB</p>
         </div>
         <div id="downloads-container" style="display:flex; flex-direction:column; gap:16px;">
-          <div class="list-item">
+          <div class="list-item" onclick="go('s-offline')">
             <div class="thumb sm book-cover" style="background-image:url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80')"></div>
             <div style="flex:1;"><h4 style="font-weight:800; font-size:16px;">Atomic Habits</h4><p class="subtle" style="font-size:13px;">Downloaded • 100%</p></div>
             <span class="pill success" style="background:transparent; border-color:var(--success);">Ready</span>
@@ -417,29 +398,59 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
     </div>
   </section>
 
-  <!-- WISHLIST -->
-  <section class="screen" id="s-wishlist">
-    <div class="scroll" style="padding-top:100px;">
-      <div class="section">
-        <h2 class="title-serif" style="font-size:36px; margin-bottom:24px;">Wishlist</h2>
-        <div id="wishlist-container" style="display:flex; flex-direction:column; gap:16px;"></div>
+  <section class="screen" id="s-offline">
+    <div class="scroll">
+      <div style="padding:120px 24px; text-align:center;">
+        <div style="font-size:48px; margin-bottom:16px;">📶</div>
+        <h1 class="title-serif" style="font-size:36px; margin-bottom:16px;">No Internet</h1>
+        <p class="subtle" style="margin-bottom:32px;">You are currently offline. You can still read your downloaded books.</p>
+        <button class="primary" onclick="go('s-reader')">Continue Reading</button>
       </div>
     </div>
   </section>
 
-  <!-- PROFILE -->
+  <!-- WISHLIST -->
+  <section class="screen" id="s-wishlist">
+    <div class="scroll" style="padding-top:100px;">
+      <div class="section"><h2 class="title-serif" style="font-size:36px; margin-bottom:24px;">Wishlist</h2><div id="wishlist-container" style="display:flex; flex-direction:column; gap:16px;"></div></div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY (Restored) -->
+  <section class="screen" id="s-community">
+    <div class="scroll" style="padding-top:100px;">
+      <div class="section">
+        <h2 class="title-serif" style="font-size:36px; margin-bottom:24px;">Community Requests</h2>
+        <div class="list-item">
+          <div style="flex:1;"><h4 style="font-weight:800; font-size:16px;">Shoe Dog</h4><p class="subtle" style="font-size:13px;">Requested by 182 users</p></div>
+          <button class="pill success" onclick="showToast('Vote Added','success')">↑ Vote</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROFILE & EDIT PROFILE (Restored) -->
   <section class="screen" id="s-profile">
     <div class="scroll" style="padding-top:100px;">
       <div class="section" style="text-align:center">
         <div style="width:100px; height:100px; border-radius:32px; background:var(--coral); color:#fff; display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:800; margin:0 auto 16px;">S</div>
         <h1 class="title-serif" style="font-size:32px; margin-bottom:4px;">Sachin Kumar</h1>
         <p class="subtle" style="margin-bottom:16px;">sachin@example.com</p>
-        <span class="pill success" id="profile-status">Annual plan active</span>
       </div>
       <div class="section" style="display:flex; flex-direction:column; gap:12px;">
-        <button class="secondary" onclick="go('s-wishlist')">View Wishlist</button>
-        <button class="secondary" onclick="showToast('Preferences saved','success')">Reading Preferences</button>
-        <button class="secondary" onclick="signOut()" style="color:var(--coral); border-color:var(--coral);">Sign Out</button>
+        <button class="secondary" onclick="go('s-edit-profile')">Edit Profile</button>
+        <button class="secondary" onclick="go('s-community')">Community Voting</button>
+        <button class="secondary" onclick="signOut()" style="color:var(--danger); border-color:var(--danger);">Sign Out</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="s-edit-profile">
+    <div class="scroll" style="padding-top:100px;">
+      <div class="section"><h2 class="title-serif" style="font-size:36px; margin-bottom:24px;">Edit Profile</h2>
+        <div style="margin-bottom:16px;"><label class="label">Display Name</label><input class="input" value="Sachin Kumar"></div>
+        <div style="margin-bottom:32px;"><label class="label">Preferences</label><div class="chips"><button class="chip active">Business</button><button class="chip active">Sci-Fi</button></div></div>
+        <button class="primary" onclick="showToast('Profile Saved','success'); go('s-profile');">Save Changes</button>
       </div>
     </div>
   </section>
@@ -448,15 +459,13 @@ button,input{font:inherit} button{cursor:pointer} a{color:inherit;text-decoratio
 </div>
 
 <script>
-// Mock Database tailored to context
+// Mock DB
 const bookDB = [
-  { id:'b1', title:'Atomic Habits', author:'James Clear', rating:'4.8★', pages:'320', cover:'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80', syn:'No matter your goals, Atomic Habits offers a proven framework for improving--every day. James Clear reveals practical strategies that will teach you exactly how to form good habits, break bad ones, and master the tiny behaviors that lead to remarkable results.', category:'Trending' },
-  { id:'b2', title:'Deep Work', author:'Cal Newport', rating:'4.7★', pages:'296', cover:'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=80', syn:'Deep work is the ability to focus without distraction on a cognitively demanding task. It\'s a skill that allows you to quickly master complicated information and produce better results in less time.', category:'Business' },
-  { id:'b3', title:'Sapiens', author:'Yuval Noah Harari', rating:'4.9★', pages:'464', cover:'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80', syn:'A brief history of humankind. Harari breaks down the Cognitive, Agricultural, and Scientific revolutions that shaped our species and our world.', category:'Trending' },
-  { id:'b4', title:'Enterprise Risk Management', author:'John Fraser', rating:'4.6★', pages:'512', cover:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80', syn:'An essential guide to ERM. Learn how to identify, assess, and mitigate business risks effectively using frameworks like PRMIA and ISO standards.', category:'Risk' },
-  { id:'b5', title:'HSE Incident Management', author:'Safety Council', rating:'4.5★', pages:'210', cover:'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=400&q=80', syn:'A detailed breakdown of HSE-012 procedures. This book covers best practices for incident reporting, hazard identification, and maintaining a safe work environment.', category:'Risk' },
-  { id:'b6', title:'Practical Risk Management', author:'PRMIA Institute', rating:'4.8★', pages:'450', cover:'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80', syn:'Master the fundamentals of ORM and ERM. Essential reading for risk professionals aiming to implement sustainable safety and financial risk controls.', category:'Risk' },
-  { id:'b7', title:'The Midnight Library', author:'Matt Haig', rating:'4.6★', pages:'304', cover:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80', syn:'Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived.', category:'Trending' }
+  { id:'b1', title:'Atomic Habits', author:'James Clear', rating:'4.8★', pages:'320', cover:'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80', syn:'No matter your goals, Atomic Habits offers a proven framework for improving--every day.'},
+  { id:'b2', title:'Deep Work', author:'Cal Newport', rating:'4.7★', pages:'296', cover:'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=80', syn:'Deep work is the ability to focus without distraction on a cognitively demanding task.'},
+  { id:'b3', title:'Sapiens', author:'Yuval Noah Harari', rating:'4.9★', pages:'464', cover:'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80', syn:'A brief history of humankind.'},
+  { id:'b4', title:'Enterprise Risk', author:'John Fraser', rating:'4.6★', pages:'512', cover:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80', syn:'An essential guide to ERM.'},
+  { id:'b5', title:'The Midnight Library', author:'Matt Haig', rating:'4.6★', pages:'304', cover:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80', syn:'Between life and death there is a library.'}
 ];
 
 // State
@@ -467,20 +476,13 @@ let isLoggedIn = false;
 let pendingPayment = false;
 let wishlist = new Set();
 
-// Navigation
+// Nav
 function go(id, push=true){
-  const next = document.getElementById(id);
-  const prev = document.getElementById(currentScreen);
+  const next = document.getElementById(id); const prev = document.getElementById(currentScreen);
   if (!next || next === prev) return;
-  
   if (push) historyStack.push(currentScreen);
-  if (prev) {
-    prev.classList.add('exit-left');
-    prev.classList.remove('active');
-    setTimeout(() => prev.classList.remove('exit-left'), 300);
-  }
-  next.classList.add('active');
-  currentScreen = id;
+  if (prev) { prev.classList.add('exit-left'); prev.classList.remove('active'); setTimeout(() => prev.classList.remove('exit-left'), 300); }
+  next.classList.add('active'); currentScreen = id;
 
   updateGlobalNav(id);
   if (id === 's-home') renderHome();
@@ -489,62 +491,47 @@ function go(id, push=true){
   if (id === 's-reader') renderReader();
 }
 
-function back(){
-  const id = historyStack.pop() || 's-home';
-  go(id, false);
-}
+function back(){ const id = historyStack.pop() || 's-home'; go(id, false); }
 
 function updateGlobalNav(screenId) {
-  const hamburger = document.getElementById('btn-hamburger');
-  const backBtn = document.getElementById('btn-back');
-  const heartBtn = document.getElementById('btn-heart');
-  const pill = document.getElementById('nav-pill');
+  const ham = document.getElementById('btn-hamburger'); const backBtn = document.getElementById('btn-back'); 
+  const heart = document.getElementById('btn-heart'); const pill = document.getElementById('nav-pill');
+  const setBtn = document.getElementById('btn-settings');
   
-  hamburger.style.display = 'none'; backBtn.style.display = 'none'; heartBtn.style.display = 'none'; pill.style.display = 'none';
+  ham.style.display = 'none'; backBtn.style.display = 'none'; heart.style.display = 'none'; pill.style.display = 'none'; setBtn.style.display = 'none';
 
-  // Toggle visual styles for dark headers
   const isDark = (screenId === 's-book-detail' || screenId === 's-search');
   document.querySelectorAll('.nav-btn').forEach(b => {
     if(isDark) { b.style.background = 'rgba(255,255,255,0.1)'; b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.2)'; b.style.backdropFilter = 'blur(8px)'; }
     else { b.style.background = '#fff'; b.style.color = 'var(--text)'; b.style.borderColor = 'rgba(0,0,0,.1)'; b.style.backdropFilter = 'none'; }
   });
 
-  if (['s-splash', 's-welcome-social', 's-signup', 's-signout', 's-plans', 's-payment-annual', 's-payment-monthly'].includes(screenId)) {
-    // Hide nav on full auth flows
+  if (['s-splash', 's-welcome-social', 's-signup', 's-otp', 's-signout', 's-plans', 's-payment-annual', 's-payment-monthly', 's-payment-failed'].includes(screenId)) {
+    // Hide
   } else if (screenId === 's-home') {
-    hamburger.style.display = 'flex'; pill.style.display = 'block';
+    ham.style.display = 'flex'; pill.style.display = 'block';
   } else if (screenId === 's-book-detail') {
-    backBtn.style.display = 'flex'; heartBtn.style.display = 'flex'; updateHeartIcon();
+    backBtn.style.display = 'flex'; heart.style.display = 'flex'; updateHeartIcon();
+  } else if (screenId === 's-reader') {
+    backBtn.style.display = 'flex'; setBtn.style.display = 'flex';
   } else {
     backBtn.style.display = 'flex';
   }
 }
 
-// Drawer
+// Drawer & Overlays
 function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); document.getElementById('drawerBackdrop').classList.toggle('show'); }
 function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerBackdrop').classList.remove('show'); }
+function toggleReaderSettings() { document.getElementById('readerSettings').classList.toggle('show'); document.getElementById('drawerBackdrop').classList.toggle('show'); }
 
-// Auth & Payment
-function loginGuest() {
-  isLoggedIn = false; pendingPayment = false;
-  go('s-home'); showToast('Browsing in Sample Mode', 'gold');
-}
-function executeLogin() {
-  isLoggedIn = true; 
-  if(pendingPayment) { go('s-plans'); } else { go('s-home'); showToast('Signed In', 'success'); }
-}
-function signOut() {
-  isLoggedIn = false; wishlist.clear(); go('s-signout');
-}
-function unlockFullBook() {
-  if(!isLoggedIn) { pendingPayment = true; showToast('Please sign in to upgrade', 'gold'); go('s-signup'); }
-  else { go('s-plans'); }
-}
-function processPayment() {
-  isLoggedIn = true; pendingPayment = false; showToast('Payment Successful! Full Library Unlocked', 'success'); go('s-home');
-}
+// Auth Flow
+function loginGuest() { isLoggedIn = false; pendingPayment = false; go('s-home'); showToast('Browsing in Sample Mode', 'gold'); }
+function executeLogin() { isLoggedIn = true; if(pendingPayment){ go('s-plans'); } else { go('s-home'); showToast('Signed In', 'success'); } }
+function signOut() { isLoggedIn = false; wishlist.clear(); go('s-signout'); }
+function unlockFullBook() { if(!isLoggedIn) { pendingPayment = true; showToast('Please sign in to upgrade', 'gold'); go('s-signup'); } else { go('s-plans'); } }
+function processPayment() { isLoggedIn = true; pendingPayment = false; showToast('Payment Successful!', 'success'); go('s-home'); }
 
-// Data Rendering
+// Rendering
 function createCardHTML(b) {
   return `<div class="card" style="min-width:300px; padding:16px; display:flex; gap:16px; align-items:center; cursor:pointer; scroll-snap-align: start;" onclick="loadBook('${b.id}')">
             <div class="thumb sm book-cover" style="background-image:url('${b.cover}')"></div>
@@ -553,17 +540,14 @@ function createCardHTML(b) {
 }
 
 function renderHome() {
-  document.getElementById('home-greeting').innerHTML = isLoggedIn 
-    ? `<h2 class="title-serif" style="font-size:36px; font-weight:800; margin-bottom:8px;">Good morning, Sachin</h2>`
-    : `<h2 class="title-serif" style="font-size:36px; font-weight:800; margin-bottom:8px;">Welcome, Guest</h2><p class="subtle">Viewing in Sample Mode.</p>`;
-
+  document.getElementById('home-greeting').innerHTML = isLoggedIn ? `<h2 class="title-serif" style="font-size:36px; font-weight:800; margin-bottom:8px;">Good morning, Sachin</h2>` : `<h2 class="title-serif" style="font-size:36px; font-weight:800; margin-bottom:8px;">Welcome, Guest</h2><p class="subtle">Viewing in Sample Mode.</p>`;
   document.getElementById('row-continue').innerHTML = createCardHTML(bookDB[0]) + createCardHTML(bookDB[1]);
-  document.getElementById('row-trending').innerHTML = createCardHTML(bookDB[2]) + createCardHTML(bookDB[6]);
-  document.getElementById('row-business').innerHTML = createCardHTML(bookDB[3]) + createCardHTML(bookDB[4]) + createCardHTML(bookDB[5]);
+  document.getElementById('row-trending').innerHTML = createCardHTML(bookDB[2]) + createCardHTML(bookDB[4]);
+  document.getElementById('row-business').innerHTML = createCardHTML(bookDB[3]) + createCardHTML(bookDB[1]);
 }
 
-function handleSearch(query) {
-  const q = query.toLowerCase();
+function handleSearch(q) {
+  q = q.toLowerCase();
   const results = bookDB.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
   let html = '';
   results.forEach(b => {
@@ -589,21 +573,14 @@ function renderWishlist() {
   container.innerHTML = html;
 }
 
-// Detail & Reader
 function loadBook(id) {
-  activeBookId = id;
-  const b = bookDB.find(x => x.id === id);
-  
+  activeBookId = id; const b = bookDB.find(x => x.id === id);
   document.getElementById('det-title').textContent = b.title; document.getElementById('det-author').textContent = b.author;
   document.getElementById('det-rating').textContent = b.rating; document.getElementById('det-pages').textContent = b.pages;
   document.getElementById('det-synopsis').textContent = b.syn;
   
   let relatedHtml = '';
-  bookDB.filter(x => x.id !== id).slice(0,3).forEach(rel => {
-    relatedHtml += `<div class="thumb lg book-cover" style="background-image:url('${rel.cover}')" onclick="loadBook('${rel.id}')">
-                      <div class="book-author">${rel.author}</div><div class="book-title">${rel.title}</div>
-                    </div>`;
-  });
+  bookDB.filter(x => x.id !== id).slice(0,3).forEach(rel => { relatedHtml += `<div class="thumb lg book-cover" style="background-image:url('${rel.cover}')" onclick="loadBook('${rel.id}')"><div class="book-author">${rel.author}</div><div class="book-title">${rel.title}</div></div>`; });
   document.getElementById('det-related').innerHTML = relatedHtml;
   
   document.getElementById('rd-title').textContent = b.title; document.getElementById('rd-author').textContent = b.author;
@@ -611,21 +588,13 @@ function loadBook(id) {
 }
 
 function renderReader() {
-  const contentDiv = document.getElementById('reader-content');
-  const paywall = document.getElementById('paywall-section');
-
+  const contentDiv = document.getElementById('reader-content'); const paywall = document.getElementById('paywall-section');
   const textHTML = `<p><span style="float:left;font-size:64px;font-weight:800;line-height:.85;color:var(--gold);margin:6px 10px 0 0;font-family:'Playfair Display',serif;">T</span>he ability to concentrate without distraction is becoming increasingly rare. Deep, meaningful work requires focused energy.</p><p>Small improvements, repeated daily, lead to massive transformations. What seems insignificant today compounds over years into remarkable achievement.</p><p>We must consciously design our environments to foster the habits we want to build, rather than relying solely on willpower.</p>`;
 
-  if (!isLoggedIn) {
-    contentDiv.innerHTML = `<div class="paywall-blur">${textHTML.split('</p>')[0]}</p></div>`;
-    paywall.style.display = 'block';
-  } else {
-    contentDiv.innerHTML = textHTML + `<p><em>End of Chapter.</em></p>`;
-    paywall.style.display = 'none';
-  }
+  if (!isLoggedIn) { contentDiv.innerHTML = `<div class="paywall-blur">${textHTML.split('</p>')[0]}</p></div>`; paywall.style.display = 'block'; } 
+  else { contentDiv.innerHTML = textHTML + `<p><em>End of Chapter.</em></p>`; paywall.style.display = 'none'; }
 }
 
-// Wishlist
 function toggleWishlist() {
   if(!activeBookId) return;
   if(wishlist.has(activeBookId)) { wishlist.delete(activeBookId); showToast('Removed from Wishlist', 'gold'); } 
@@ -635,20 +604,29 @@ function toggleWishlist() {
 function updateHeartIcon() {
   const btn = document.getElementById('btn-heart');
   if(wishlist.has(activeBookId)) { btn.style.color = 'var(--coral)'; btn.innerHTML = '♥'; } 
-  else { btn.style.color = '#fff'; btn.innerHTML = '♡'; }
+  else { btn.style.color = 'var(--text)'; btn.innerHTML = '♡'; }
 }
 
-// Utils
+// Reader Settings (Restored)
+function setReaderTheme(mode, el) {
+  const reader = document.getElementById('s-reader');
+  reader.style.setProperty('--reader', mode === 'dark' ? '#111827' : mode === 'sepia' ? '#fdf6e3' : '#fffaf2');
+  reader.style.setProperty('--readerText', mode === 'dark' ? '#f8fafc' : mode === 'sepia' ? '#4c3b2b' : '#1e293b');
+  document.querySelectorAll('.settings-btn').forEach(b => { if(b.parentElement.previousElementSibling.textContent.includes('Theme')) b.classList.remove('active') });
+  el.classList.add('active');
+}
+function setFontSize(size, el) {
+  document.getElementById('reader-content').style.fontSize = size;
+  document.querySelectorAll('.settings-btn').forEach(b => { if(b.parentElement.previousElementSibling.textContent.includes('Size')) b.classList.remove('active') });
+  el.classList.add('active');
+}
+
 function showToast(msg, type=''){
-  const root = document.getElementById('toast');
-  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
-  root.appendChild(t); requestAnimationFrame(()=> t.classList.add('show'));
-  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=> t.remove(), 260); }, 2200);
+  const root = document.getElementById('toast'); const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  root.appendChild(t); requestAnimationFrame(()=> t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=> t.remove(), 260); }, 2200);
 }
 
-// Init
 setTimeout(() => { go('s-splash'); setTimeout(() => go('s-welcome-social'), 1500); }, 100);
-
 </script>
 </body>
 </html>
