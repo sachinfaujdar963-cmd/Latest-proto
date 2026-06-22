@@ -2601,12 +2601,15 @@ function renderCommunity(){
       <button class="vote-btn" onclick="upvoteRequest(${r.id})">↑ Vote</button>
     </div>`).join('');
 }
+
 function submitBookRequest(){
   const inp=document.getElementById('new-request-input');
   const val=inp.value.trim(); if(!val){ showToast('Please enter a book title','danger'); return; }
-  communityRequests.push({id:Date.now(),title:val,votes:1}); inp.value='';
+  communityRequests.push({id:Date.now(),title:val,votes:1}); 
+  inp.value='';
   showToast('📚 Book requested!','success'); renderCommunity();
 }
+
 function upvoteRequest(id){
   const r=communityRequests.find(x=>x.id===id); if(r){ r.votes++; renderCommunity(); showToast('✅ Vote added','success'); }
 }
@@ -2784,7 +2787,7 @@ function selectShipping(el,type){
 function renderShippingOrderSummary(){
   const el=document.getElementById('shipping-order-summary'); if(!el) return;
   const total=getCartTotal();
-  el.innerHTML=\`<div class="order-summary-mini"><div class="order-summary-mini-row"><span>\${cart.length} item(s)</span><span>₹\${total}</span></div><div class="order-summary-mini-row"><span>Shipping</span><span>₹99</span></div><div class="order-summary-mini-total"><span>Total</span><span>₹\${Math.round((total+99)*1.18)}</span></div></div>\`;
+  el.innerHTML=`<div class="order-summary-mini"><div class="order-summary-mini-row"><span>${cart.length} item(s)</span><span>₹${total}</span></div><div class="order-summary-mini-row"><span>Shipping</span><span>₹99</span></div><div class="order-summary-mini-total"><span>Total</span><span>₹${Math.round((total+99)*1.18)}</span></div></div>`;
   const el2=document.getElementById('billing-order-summary'); if(!el2) return;
   el2.innerHTML=el.innerHTML;
 }
@@ -2815,26 +2818,22 @@ window.loadBook = function(id, dest){
   const buyBar = document.getElementById('det-buy-bar');
   const dlBtn  = document.getElementById('dl-btn');
 
-  // ── RULE: Only isPremium:true books show Buy / Rent bar
-  //    All other books = included in subscription → Read Now + Download
   if(b.isPremium === true){
     if(buyBar){
       buyBar.style.display='flex';
       const rentBtn=buyBar.querySelector('.btn-rent');
       const buyBtn =buyBar.querySelector('.btn-buy-now');
       const cartBtn=buyBar.querySelector('.btn-cart');
-      if(rentBtn) rentBtn.innerHTML=\`⏱ Rent <strong>₹\${b.rent7||39}</strong>/7d\`;
-      if(buyBtn)  buyBtn.innerHTML =\`💳 Buy <strong>₹\${b.price||199}</strong>\`;
+      if(rentBtn) rentBtn.innerHTML=`⏱ Rent <strong>₹${b.rent7||39}</strong>/7d`;
+      if(buyBtn)  buyBtn.innerHTML =`💳 Buy <strong>₹${b.price||199}</strong>`;
       if(cartBtn) cartBtn.onclick = ()=>addToCart(b.id,'buy');
     }
     if(subBar) subBar.style.display='none';
   } else {
-    // Subscription book — show standard read bar
     if(subBar) subBar.style.display='flex';
     if(buyBar) buyBar.style.display='none';
-    // Add paperback option to download button label for books with paperback
     if(dlBtn && b.paperback){
-      dlBtn.title = \`Also available as Paperback ₹\${b.paperback}\`;
+      dlBtn.title = `Also available as Paperback ₹${b.paperback}`;
     }
   }
   const wb2=document.getElementById('wish-btn-2');
@@ -2866,7 +2865,6 @@ function sortResults(val){
 const _origHandleSearch = handleSearch;
 window.handleSearch = function(q){
   q = (q||'').trim().toLowerCase();
-  // Get active genre filters
   const genreFilters=[...document.querySelectorAll('#filter-sidebar input[data-filter="genre"]:checked')].map(c=>c.value.toLowerCase());
   const formatFilters=[...document.querySelectorAll('#filter-sidebar input[data-filter="format"]:checked')].map(c=>c.value.toLowerCase());
   const ratingFilter = parseFloat((document.querySelector('#filter-sidebar input[name="rating-filter"]:checked')||{}).value||0);
@@ -2886,13 +2884,12 @@ window.handleSearch = function(q){
     );
     return matchQ && matchGenre && matchPrice && matchRating && (formatFilters.length===0||matchFormat);
   });
-  // Sort
   if(sortVal==='rating') results.sort((a,b)=>parseFloat(b.rating)-parseFloat(a.rating));
   else if(sortVal==='price-asc') results.sort((a,b)=>(a.price||0)-(b.price||0));
   else if(sortVal==='price-desc') results.sort((a,b)=>(b.price||0)-(a.price||0));
   else if(sortVal==='az') results.sort((a,b)=>a.title.localeCompare(b.title));
   const countEl=document.getElementById('result-count');
-  if(countEl) countEl.textContent=\`\${results.length} result\${results.length!==1?'s':''}\${q?' for "'+q+'"':''}\`;
+  if(countEl) countEl.textContent=`${results.length} result${results.length!==1?'s':''}${q?' for "'+q+'"':''}`;
   const trendingSection=document.getElementById('trending-section');
   const resultsEl=document.getElementById('search-results');
   if(!q && !genreFilters.length && !formatFilters.length && ratingFilter===0){
@@ -2901,29 +2898,29 @@ window.handleSearch = function(q){
   }
   if(trendingSection) trendingSection.style.display='none';
   if(!resultsEl) return;
-  if(!results.length){ resultsEl.innerHTML=\`<div style="padding:32px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🔍</div><p class="subtle">No books matched your filters.</p><button class="btn-secondary" style="margin-top:12px;max-width:240px" onclick="clearFilters()">Clear Filters</button></div>\`; return; }
+  if(!results.length){ resultsEl.innerHTML=`<div style="padding:32px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🔍</div><p class="subtle">No books matched your filters.</p><button class="btn-secondary" style="margin-top:12px;max-width:240px" onclick="clearFilters()">Clear Filters</button></div>`; return; }
   resultsEl.innerHTML = results.map(b=>{
-    const priceTag=b.price?\`<span class="price-tag">₹\${b.price}</span>\`:'';
-    return \`<div class="result-row" onclick="loadBook('\${b.id}')">
-      <div class="result-cover" style="background-image:url('\${b.cover}');position:relative">
-        \${priceTag?\`<div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.8);color:var(--gold);font-size:10px;font-weight:800;padding:2px 6px;border-radius:8px">\${b.price?'₹'+b.price:''}</div>\`:''}
+    const priceTag=b.price?`<span class="price-tag">₹${b.price}</span>`:'';
+    return `<div class="result-row" onclick="loadBook('${b.id}')">
+      <div class="result-cover" style="background-image:url('${b.cover}');position:relative">
+        ${priceTag?`<div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.8);color:var(--gold);font-size:10px;font-weight:800;padding:2px 6px;border-radius:8px">${b.price?'₹'+b.price:''}</div>`:''}
       </div>
       <div class="result-info">
-        <div class="result-title">\${b.title}</div>
-        <div class="result-author">\${b.author}</div>
+        <div class="result-title">${b.title}</div>
+        <div class="result-author">${b.author}</div>
         <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
-          <span class="pill pill-gold" style="font-size:10px">\${b.genre}</span>
-          \${b.isPremium?'<span class="pill pill-coral" style="font-size:10px">Premium</span>':''}
-          \${b.paperback?'<span class="pill pill-success" style="font-size:10px">Paperback ₹'+b.paperback+'</span>':''}
+          <span class="pill pill-gold" style="font-size:10px">${b.genre}</span>
+          ${b.isPremium?'<span class="pill pill-coral" style="font-size:10px">Premium</span>':''}
+          ${b.paperback?'<span class="pill pill-success" style="font-size:10px">Paperback ₹'+b.paperback+'</span>':''}
         </div>
-        <div class="result-rating">\${b.rating} · \${b.pages}pp</div>
-        \${b.isPremium ? \`<div style="display:flex;gap:6px;margin-top:8px">
-          \${b.rent7?\`<button class="mini-btn rent" onclick="event.stopPropagation();addToCart('\${b.id}','rent')" style="flex:1;padding:7px 4px;font-size:11px">⏱ Rent ₹\${b.rent7}</button>\`:''}
-          \${b.price?\`<button class="mini-btn buy" onclick="event.stopPropagation();addToCart('\${b.id}','buy')" style="flex:1;padding:7px 4px;font-size:11px">Buy ₹\${b.price}</button>\`:''}
-        </div>\` : \`<div style="display:flex;gap:6px;margin-top:8px"><span class="pill pill-success" style="font-size:10px;padding:5px 10px">✓ Included in Subscription</span></div>\`}
+        <div class="result-rating">${b.rating} · ${b.pages}pp</div>
+        ${b.isPremium ? `<div style="display:flex;gap:6px;margin-top:8px">
+          ${b.rent7?`<button class="mini-btn rent" onclick="event.stopPropagation();addToCart('${b.id}','rent')" style="flex:1;padding:7px 4px;font-size:11px">⏱ Rent ₹${b.rent7}</button>`:''}
+          ${b.price?`<button class="mini-btn buy" onclick="event.stopPropagation();addToCart('${b.id}','buy')" style="flex:1;padding:7px 4px;font-size:11px">Buy ₹${b.price}</button>`:''}
+        </div>` : `<div style="display:flex;gap:6px;margin-top:8px"><span class="pill pill-success" style="font-size:10px;padding:5px 10px">✓ Included in Subscription</span></div>`}
       </div>
       <span style="font-size:18px;color:var(--text3);padding:8px;flex-shrink:0">›</span>
-    </div>\`;
+    </div>`;
   }).join('');
 };
 
@@ -2950,17 +2947,14 @@ window.onScreenEnter = function(id){
 
 // ═══════════════════════════════════════════════════
 // BOOK COVERS — buy hover on book cover wrappers
-// Enhanced renderRow to add price tags
 // ═══════════════════════════════════════════════════
 const _origRenderRow = renderRow;
 window.renderRow = function(containerId, ids, type){
   _origRenderRow(containerId, ids, type);
-  // After rendering, wrap covers with price+hover
-  // Price overlays ONLY for isPremium books on home rows
   if(type!=='continue'){
     const el=document.getElementById(containerId); if(!el) return;
     ids.forEach(id=>{
-      const b=bookDB.find(x=>x.id===id); if(!b||!b.isPremium) return; // only premium
+      const b=bookDB.find(x=>x.id===id); if(!b||!b.isPremium) return;
       const covers=el.querySelectorAll('.book-cover');
       covers.forEach(cover=>{
         if(cover.onclick && cover.onclick.toString().includes(id)){
@@ -2985,7 +2979,6 @@ const _origRenderHome = renderHome;
 window.renderHome = function(){
   renderPremiumRow();
   _origRenderHome();
-  // Override with expanded book selection
   renderRow('row-continue', ['b1','b2','b3'], 'continue');
   renderRow('row-trending', ['b5','b6','b11','b12','b14','b17'], 'md');
   renderRow('row-business', ['b4','b8','b2','b23','b24','b25','b26'], 'md');
