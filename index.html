@@ -767,6 +767,15 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
   display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;
   color:#fff;margin:0 auto 16px;}
 
+  /* ══ BIGGER TEXT & COVERS OVERRIDE ══ */
+.book-title-ov { font-size: 18px; bottom: 14px; }
+.book-author-ov { font-size: 14px; bottom: 42px; }
+.cover-sm { width: 150px; height: 220px; }
+.cover-md { width: 180px; height: 260px; }
+.cover-lg { width: 220px; height: 320px; }
+.result-title, .cart-item-title { font-size: 18px; }
+.result-author, .cart-item-author { font-size: 15px; }
+.feature-row { padding-bottom: 24px; }
 </style>
 
 <body>
@@ -3047,6 +3056,75 @@ function renderPremiumRow(){
     </div>`;
   }).join('');
 }
+// ═══════════════════════════════════════════════════
+// NETFLIX-STYLE FLOW & ONBOARDING OVERRIDES
+// ═══════════════════════════════════════════════════
+
+// 1. Force the app to start on the Homepage instead of Onboarding
+const _origGo = go;
+let initialLaunch = true;
+window.go = function(id, push=true) {
+    if(initialLaunch && id === 's-tutorial-1') {
+        initialLaunch = false;
+        _origGo('s-home', push); // Reroute startup directly to Home
+        return;
+    }
+    _origGo(id, push);
+};
+
+// 2. Route unauthenticated users to Onboarding when they try to read a premium book
+const origRenderReader = renderReader;
+window.renderReader = function() {
+    origRenderReader();
+    if(!isLoggedIn) {
+        const paywallBox = document.querySelector('.paywall-box');
+        if(paywallBox) {
+            const btn = paywallBox.querySelector('.btn-primary');
+            // Change "Unlock Full Book" to trigger the Onboarding flow
+            if(btn) btn.onclick = () => go('s-tutorial-1'); 
+        }
+    }
+}
+
+// 3. Route unauthenticated users to Onboarding during Cart Checkout
+const origRenderCart = renderCart;
+window.renderCart = function() {
+    origRenderCart();
+    const actionBlock = document.getElementById('cart-action-block');
+    if(actionBlock && cart.length > 0) {
+        const hasPaperback = cart.some(i=>i.type==='paperback');
+        actionBlock.innerHTML = `<button class="btn-primary" onclick="if(!isLoggedIn){go('s-tutorial-1'); return;} ${hasPaperback?'go(\'s-shipping\')':'go(\'s-billing\')}">${hasPaperback?'Proceed to Shipping →':'Proceed to Payment →'}</button>
+          <button class="btn-secondary" style="margin-top:10px" onclick="go('s-home')">Continue Shopping</button>`;
+    }
+}
+
+window.processCartPayment = function(){
+  if(!isLoggedIn){ showToast('Please sign in to complete purchase','gold'); go('s-tutorial-1'); return; }
+  const total = Math.round(getCartTotal()*1.18);
+  const orderNum = 'PT'+Date.now().toString().slice(-8);
+  const items = cart.map(i=>{ const b=bookDB.find(x=>x.id===i.bookId); return b?b.title:''; }).join(', ');
+  const el = document.getElementById('order-confirm-details');
+  if(el) el.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:var(--text2)">Order ID</span><span style="font-weight:700;color:var(--text)">#${orderNum}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:var(--text2)">Items</span><span style="font-weight:700;color:var(--text);max-width:200px;text-align:right;font-size:13px">${items}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:var(--text2)">Amount Paid</span><span style="font-weight:700;color:var(--gold)">₹${total}</span></div>
+    <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--text2)">Delivery</span><span style="font-weight:700;color:var(--success)">3-5 Business Days</span></div>`;
+  go('s-order-confirm');
+  showToast('Payment successful! 🎉','success');
+}
+
+// 4. Route unauthenticated users to Onboarding if they click Buy/Rent directly on a book
+const origLoadBookFinal = loadBook;
+window.loadBook = function(id, dest){
+  origLoadBookFinal(id, dest);
+  const b = bookDB.find(x=>x.id===id); if(!b) return;
+  const buyBar = document.getElementById('det-buy-bar');
+  if(b.isPremium === true && buyBar){
+      const rentBtn=buyBar.querySelector('.btn-rent');
+      const buyBtn =buyBar.querySelector('.btn-buy-now');
+      if(rentBtn) rentBtn.onclick = () => { if(!isLoggedIn){ go('s-tutorial-1'); return; } addToCart(b.id,'rent'); go('s-billing'); };
+      if(buyBtn)  buyBtn.onclick = () => { if(!isLoggedIn){ go('s-tutorial-1'); return; } addToCart(b.id,'buy'); go('s-shipping'); };
+  }
+};
 </script>
 </body>
 </html>
