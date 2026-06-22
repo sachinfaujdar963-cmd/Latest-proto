@@ -2865,11 +2865,13 @@ function sortResults(val){
 const _origHandleSearch = handleSearch;
 window.handleSearch = function(q){
   q = (q||'').trim().toLowerCase();
+  // Get active genre filters
   const genreFilters=[...document.querySelectorAll('#filter-sidebar input[data-filter="genre"]:checked')].map(c=>c.value.toLowerCase());
   const formatFilters=[...document.querySelectorAll('#filter-sidebar input[data-filter="format"]:checked')].map(c=>c.value.toLowerCase());
   const ratingFilter = parseFloat((document.querySelector('#filter-sidebar input[name="rating-filter"]:checked')||{}).value||0);
   const maxPrice = parseInt((document.getElementById('price-slider')||{}).value||1000);
   const sortVal = (document.getElementById('sort-select')||{}).value||'relevance';
+  
   let results = bookDB.filter(b=>{
     const matchQ = !q || b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||b.genre.toLowerCase().includes(q);
     const matchGenre = !genreFilters.length || genreFilters.includes(b.genre.toLowerCase());
@@ -2884,21 +2886,32 @@ window.handleSearch = function(q){
     );
     return matchQ && matchGenre && matchPrice && matchRating && (formatFilters.length===0||matchFormat);
   });
+  
+  // Sort
   if(sortVal==='rating') results.sort((a,b)=>parseFloat(b.rating)-parseFloat(a.rating));
   else if(sortVal==='price-asc') results.sort((a,b)=>(a.price||0)-(b.price||0));
   else if(sortVal==='price-desc') results.sort((a,b)=>(b.price||0)-(a.price||0));
   else if(sortVal==='az') results.sort((a,b)=>a.title.localeCompare(b.title));
+  
   const countEl=document.getElementById('result-count');
   if(countEl) countEl.textContent=`${results.length} result${results.length!==1?'s':''}${q?' for "'+q+'"':''}`;
+  
   const trendingSection=document.getElementById('trending-section');
   const resultsEl=document.getElementById('search-results');
+  
+  // -- BUG FIX: Properly toggle the display property --
   if(!q && !genreFilters.length && !formatFilters.length && ratingFilter===0){
     if(trendingSection) trendingSection.style.display='block';
-    if(resultsEl) resultsEl.innerHTML=''; return;
+    if(resultsEl) { resultsEl.innerHTML=''; resultsEl.style.display='none'; }
+    return;
   }
   if(trendingSection) trendingSection.style.display='none';
+  if(resultsEl) resultsEl.style.display='flex'; // Forces the hidden results to show
   if(!resultsEl) return;
+  // ---------------------------------------------------
+  
   if(!results.length){ resultsEl.innerHTML=`<div style="padding:32px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🔍</div><p class="subtle">No books matched your filters.</p><button class="btn-secondary" style="margin-top:12px;max-width:240px" onclick="clearFilters()">Clear Filters</button></div>`; return; }
+  
   resultsEl.innerHTML = results.map(b=>{
     const priceTag=b.price?`<span class="price-tag">₹${b.price}</span>`:'';
     return `<div class="result-row" onclick="loadBook('${b.id}')">
