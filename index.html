@@ -538,9 +538,14 @@ body.light{
 /* Dynamic Image Logo Classes */
 /* FORCE LOGO LOAD */
 .brand-logo-img {
-    height: 48px;
-    width: auto;
-    cursor: pointer;
+    display: inline-block !important;
+    width: 160px !important;
+    height: 48px !important;
+    background-image: url('logo-dark.jpg') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: left center !important;
+    cursor: pointer !important;
     border-radius: 6px;
 }
 body.light .brand-logo-img {
@@ -777,7 +782,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
   <div class="nav-left">
     <button class="nav-btn" id="btn-hamburger" onclick="toggleDrawer()" style="display:none">☰</button>
     <button class="nav-btn back-btn" id="btn-back" onclick="back()" style="display:none">←</button>
-<img src="logo-dark.jpg" class="brand-logo-img" onclick="go('s-home')" id="nav-brand" style="display:none" alt="PageTurn">
+<div class="brand-logo-img" onclick="go('s-home')" id="nav-brand" style="display:none"></div>
   </div>
   <div class="nav-right">
     <button class="nav-search-btn" id="btn-search-nav" onclick="go('s-search')" style="display:none">
@@ -799,7 +804,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
 <aside class="drawer" id="drawer">
   <div class="drawer-header">
- <div class="drawer-logo" style="display: flex; align-items: center; height: 36px;">   <img src="logo-dark.jpg" class="brand-logo-img" style="margin: 0;" alt="PageTurn"> </div>
+ <div class="drawer-logo"><div class="brand-logo-img"></div></div>
     <div class="drawer-user" id="drawer-user">Not signed in</div>
   </div>
   <div class="drawer-scroll">
@@ -912,10 +917,8 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
   <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:linear-gradient(160deg,#07071a 0%,#0f0d2e 50%,#1a0a1a 100%)">
     <div class="anim-up" style="display:flex;flex-direction:column;align-items:center;gap:14px">
       
-     <div>
-  <img src="logo-dark.jpg" class="brand-logo-img" style="height: 72px; width: auto;" alt="PageTurn">
-</div>
-      
+<div class="brand-logo-img" style="height: 72px; width: 280px; background-position: center; background-image: url('logo-dark.jpg') !important;"></div>
+
       <div style="font-size:13px;color:#8b8faa;letter-spacing:3px;text-transform:uppercase">The World's Books, In Your Pocket</div>
     </div>
     <div style="width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:24px">
@@ -1278,7 +1281,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
     <footer class="site-footer">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo"><img src="logo-dark.jpg" class="brand-logo-img" alt="PageTurn"></div>
+          <div class="footer-logo"><div class="brand-logo-img"></div></div>
           <div class="footer-tagline">India's Netflix for Books. 50,000+ titles, one subscription. Read anywhere, even offline.</div>
           <div class="footer-badges">
             <div class="footer-badge"><div class="footer-badge-icon">📱</div><div class="footer-badge-text">iOS & Android</div></div>
@@ -1821,7 +1824,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
   <div class="topbar"><button class="back-btn" onclick="back()">←</button><h2>About PageTurn</h2><div style="width:40px"></div></div>
   <div class="scroll">
     <div style="padding:0 24px;text-align:center;margin-bottom:32px">
-     <div><img src="logo-dark.jpg" class="brand-logo-img" style="height: 64px; width: auto; margin-bottom: 8px;" alt="PageTurn"></div>
+     <div class="brand-logo-img" style="height: 64px; width: 250px; background-position: center; margin-bottom: 8px;"></div>
       <p class="subtle" style="max-width:360px;margin:0 auto">India's first Netflix-style subscription platform for books. Every story, every genre, one price.</p>
       <div style="display:flex;justify-content:center;gap:10px;margin-top:16px">
         <span class="pill pill-gold">Est. 2024</span>
