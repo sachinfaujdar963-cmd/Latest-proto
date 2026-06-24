@@ -527,30 +527,20 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 
 /* ═══ LIGHT / DARK THEME ═══ */
 body.light {
-  /* High contrast colors for visibility */
   --bg: #ffffff; 
-  --surface: #f8f9fa; 
-  --surface2: #e9ecef;
+  --surface: #ffffff; 
+  --surface2: #f8f9fa;
   --border: #dee2e6;
-  --text: #000000;      /* Pure black text for maximum visibility */
-  --text2: #495057;     /* Dark gray secondary text */
-  --text3: #adb5bd;
-  --gold: #d97706; 
-  --coral: #c25e3e;
-  --coral2: #a34830;
-  --success: #059669;
-  --danger: #dc2626;
-  --reader: #fffaf2;
-  --readerText: #1e293b;
+  --text: #000000;
+  --text2: #495057;
   --nav-bg: #ffffff;
 }
 
-/* Force the header to be solid white */
-body.light .global-nav {
-    background: #ffffff !important;
-    border-bottom: 1px solid #dee2e6 !important;
-    background-image: none !important; /* Removes the gradient */
-}
+/* Force specific problematic elements to match light theme */
+body.light .screen { background: #ffffff !important; }
+body.light .global-nav { background: #ffffff !important; }
+body.light .home-hero { background: #ffffff !important; color: #000000; }
+body.light .hero-desc { color: #495057 !important; }
 /* Dynamic Image Logo Classes */
 /* FORCE LOGO LOAD FROM WEB */
 .brand-logo-img {
@@ -795,11 +785,15 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 
 <!-- ══ GLOBAL NAV ══ -->
 <nav class="global-nav" id="global-nav">
-  <div class="nav-left">
+<div class="nav-left">
     <button class="nav-btn" id="btn-hamburger" onclick="toggleDrawer()" style="display:none">☰</button>
     <button class="nav-btn back-btn" id="btn-back" onclick="back()" style="display:none">←</button>
-<div class="brand-logo-img" onclick="go('s-home')" id="nav-brand" style="display:none"></div>
-  </div>
+    
+    <div onclick="go('s-home')" id="nav-brand" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <div class="brand-logo-img"></div>
+        <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--text);">PageTurn</span>
+    </div>
+</div>
   <div class="nav-right">
     <button class="nav-search-btn" id="btn-search-nav" onclick="go('s-search')" style="display:none">
       🔍 <span>Search</span>
@@ -1297,7 +1291,10 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
     <footer class="site-footer">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo"><div class="brand-logo-img"></div></div>
+          <div class="footer-logo" style="display:flex; align-items:center; gap:8px;">
+    <div class="brand-logo-img"></div>
+    <span>PageTurn</span>
+</div>
           <div class="footer-tagline">India's Netflix for Books. 50,000+ titles, one subscription. Read anywhere, even offline.</div>
           <div class="footer-badges">
             <div class="footer-badge"><div class="footer-badge-icon">📱</div><div class="footer-badge-text">iOS & Android</div></div>
