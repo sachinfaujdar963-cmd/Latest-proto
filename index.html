@@ -526,21 +526,35 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
   font-size:32px;margin:0 auto 20px;}
 
 /* ═══ LIGHT / DARK THEME ═══ */
+/* ═══ LIGHT MODE OVERRIDE ═══ */
 body.light {
   --bg: #ffffff; 
   --surface: #ffffff; 
-  --surface2: #f8f9fa;
-  --border: #dee2e6;
+  --surface2: #f0f0f0;
+  --border: #cccccc; /* Darker border for visibility */
   --text: #000000;
-  --text2: #495057;
+  --text2: #222222;
   --nav-bg: #ffffff;
 }
 
-/* Force specific problematic elements to match light theme */
-body.light .screen { background: #ffffff !important; }
-body.light .global-nav { background: #ffffff !important; }
-body.light .home-hero { background: #ffffff !important; color: #000000; }
-body.light .hero-desc { color: #495057 !important; }
+body.light .global-nav, 
+body.light .global-nav.solid {
+    background: #ffffff !important;
+    background-image: none !important; /* Removes the gradient */
+    border-bottom: 2px solid #cccccc !important; /* Clearly visible border */
+}
+
+body.light .card, 
+body.light .det-stats, 
+body.light .search-input-wrap, 
+body.light .result-row, 
+body.light .drawer, 
+body.light .site-footer {
+    background: #ffffff !important;
+    border: 2px solid #cccccc !important; /* Thicker borders for boxes */
+}
+
+body.light .hero-title, body.light .hero-desc { color: #000000 !important; }
 /* Dynamic Image Logo Classes */
 /* FORCE LOGO LOAD FROM WEB */
 .brand-logo-img {
@@ -789,10 +803,10 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
     <button class="nav-btn" id="btn-hamburger" onclick="toggleDrawer()" style="display:none">☰</button>
     <button class="nav-btn back-btn" id="btn-back" onclick="back()" style="display:none">←</button>
     
-    <div onclick="go('s-home')" id="nav-brand" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-        <div class="brand-logo-img"></div>
-        <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--text);">PageTurn</span>
-    </div>
+<div onclick="go('s-home')" id="nav-brand" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+    <img src="https://i.postimg.cc/J4P7GRDf/logo-dark.png" class="brand-logo-img" style="height:40px; width:40px;">
+    <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:black;">PageTurn</span>
+</div>
 </div>
   <div class="nav-right">
     <button class="nav-search-btn" id="btn-search-nav" onclick="go('s-search')" style="display:none">
@@ -1291,9 +1305,9 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
     <footer class="site-footer">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo" style="display:flex; align-items:center; gap:8px;">
-    <div class="brand-logo-img"></div>
-    <span>PageTurn</span>
+          <div class="footer-logo" style="display:flex; align-items:center; gap:10px;">
+    <img src="https://i.postimg.cc/J4P7GRDf/logo-dark.png" style="height:40px; width:40px;">
+    <span style="color:black;">PageTurn</span>
 </div>
           <div class="footer-tagline">India's Netflix for Books. 50,000+ titles, one subscription. Read anywhere, even offline.</div>
           <div class="footer-badges">
