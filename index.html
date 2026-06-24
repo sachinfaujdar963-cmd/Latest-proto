@@ -28,7 +28,7 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
   padding:0 24px;pointer-events:none;
   background:linear-gradient(to bottom,rgba(13,13,13,.97) 0%,rgba(13,13,13,0) 100%);
   transition:background .3s;}
-.global-nav.solid{background:rgba(13,13,13,.99);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.global-nav.solid{background:rgba(13,13,13,.99);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);pointer-events:auto;}
 .nav-left,.nav-right{display:flex;gap:10px;pointer-events:auto;align-items:center;}
 .nav-btn{width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
   background:rgba(255,255,255,.08);backdrop-filter:blur(8px);
@@ -213,7 +213,7 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 /* ── HOME HERO (Netflix) ── */
 .home-hero{position:relative;width:100%;height:580px;background-size:cover;
   background-position:center;display:flex;flex-direction:column;
-  justify-content:flex-end;padding:56px 52px 48px;color:#fff;
+  justify-content:flex-end;padding:96px 52px 48px;color:#fff;
   transition:background-image .8s ease;}
 .home-hero::before{content:'';position:absolute;inset:0;
   background:linear-gradient(to right,rgba(13,13,13,.92) 0%,rgba(13,13,13,.45) 55%,transparent 100%);}
@@ -251,7 +251,7 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 
 /* ── SEARCH SCREEN (Netflix dark) ── */
 #s-search{background:#0a0a14;}
-.search-topbar{padding:80px 24px 20px;display:flex;align-items:center;gap:12px;}
+.search-topbar{padding:96px 24px 20px;display:flex;align-items:center;gap:12px;}
 .search-input-wrap{flex:1;display:flex;align-items:center;gap:10px;
   background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);
   border-radius:14px;padding:13px 18px;transition:border-color .2s;}
@@ -312,8 +312,7 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 
 /* ── READER ── */
 #s-reader{background:var(--reader);}
-.reader-topbar{padding:56px 20px 14px;display:flex;justify-content:space-between;
-  align-items:center;background:linear-gradient(var(--reader),transparent);}
+.reader-topbar{padding:80px 20px 14px;display:flex;justify-content:space-between; align-items:center;background:linear-gradient(var(--reader),transparent);}
 .reader-back{background:rgba(0,0,0,.08);border:none;width:38px;height:38px;
   border-radius:50%;display:flex;align-items:center;justify-content:center;
   font-size:18px;cursor:pointer;color:var(--readerText);transition:all .2s;}
@@ -421,7 +420,7 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 .vote-btn:hover{background:rgba(76,175,130,.2);}
 
 /* ── PROFILE ── */
-.profile-hero{padding:80px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.profile-hero{padding:96px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .profile-avatar{width:88px;height:88px;border-radius:50%;
   background:linear-gradient(135deg,var(--gold),var(--coral));
   display:flex;align-items:center;justify-content:center;font-size:34px;
@@ -484,7 +483,7 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
 /* ── MISC ── */
-.topbar{padding:80px 24px 20px;display:flex;align-items:center;gap:12px;}
+.topbar{padding:96px 24px 20px;display:flex;align-items:center;gap:12px;}
 .topbar h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:var(--text);}
 .list-item{display:flex;align-items:center;gap:14px;padding:12px;
   background:var(--surface);border-radius:14px;border:1px solid var(--border);
@@ -517,7 +516,8 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 @media(min-width:768px){
   .reader-content{font-size:22px;}
   .hero-title{font-size:88px;}
-  .home-hero{height:75vh;padding:80px 60px 56px;}
+  .home-hero{height:75vh;padding:120px 60px 56px;}
+}
 }
 /* ── NO RESULTS ── */
 .empty-state{padding:80px 32px;text-align:center;}
@@ -536,7 +536,7 @@ body.light{
 }
 body.light .screen{background:var(--bg);}
 body.light .global-nav{background:linear-gradient(to bottom,rgba(250,248,245,.98),transparent);}
-body.light .global-nav.solid{background:rgba(250,248,245,.99);border-bottom:1px solid var(--border);}
+body.light .global-nav.solid{background:rgba(250,248,245,.99);border-bottom:1px solid var(--border);pointer-events:auto;}
 body.light .nav-btn{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.1);color:var(--text);}
 body.light .drawer{background:var(--surface);}
 body.light .book-cover{box-shadow:0 8px 24px rgba(0,0,0,.12);}
@@ -2192,25 +2192,21 @@ function updateNav(id){
   const profile = document.getElementById('btn-profile');
   const nav = document.getElementById('global-nav');
   [ham,backBtn,heart,settings,searchNav,brand,profile].forEach(b=>b&&(b.style.display='none'));
-  const noNavScreens = ['s-splash','s-tutorial-1','s-tutorial-2','s-tutorial-3',
+ const noNavScreens = ['s-splash','s-tutorial-1','s-tutorial-2','s-tutorial-3',
     's-welcome-social','s-signup','s-otp','s-plans','s-payment-annual',
-    's-payment-monthly','s-payment-trial','s-payment-failed','s-success','s-signout','s-genre-pick'];
+    's-payment-monthly','s-payment-trial','s-payment-failed','s-success','s-signout','s-genre-pick', 's-reader'];
   if(noNavScreens.includes(id)){ nav.className='global-nav'; return; }
   if(id==='s-home'){
     ham.style.display='flex'; brand.style.display='flex';
     searchNav.style.display='flex'; profile.style.display='flex';
     nav.className='global-nav';
-  } else if(id==='s-reader'){
-    backBtn.style.display='flex'; settings.style.display='flex';
-    nav.className='global-nav solid';
   } else if(id==='s-book-detail'){
     backBtn.style.display='flex'; heart.style.display='flex';
     nav.className='global-nav'; updateHeartIcon();
   } else if(id==='s-search'){
-    backBtn.style.display='flex';
     nav.className='global-nav solid';
   } else {
-    backBtn.style.display='flex'; brand.style.display='flex';
+    brand.style.display='flex';
     profile.style.display='flex';
     nav.className='global-nav solid';
   }
