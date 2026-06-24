@@ -2768,7 +2768,7 @@ function toggleTheme(){
 // CART SYSTEM
 // ═══════════════════════════════════════════════════
 let cart = [];
-
+let ownedBooks = new Set();
 function addToCart(bookId, type){
   const b = bookDB.find(x=>x.id===bookId); if(!b) return;
   let price = 0, label = '', period = '';
@@ -2845,6 +2845,14 @@ function processCartPayment(){
   if(!isLoggedIn){ showToast('Please sign in to complete purchase','gold'); go('s-signup'); return; }
   const total = Math.round(getCartTotal()*1.18);
   const orderNum = 'PT'+Date.now().toString().slice(-8);
+  
+  // Add digital items to owned books list
+  cart.forEach(item => {
+    if(item.type === 'buy' || item.type === 'rent') {
+      ownedBooks.add(item.bookId);
+    }
+  });
+
   const items = cart.map(i=>{ const b=bookDB.find(x=>x.id===i.bookId); return b?b.title:''; }).join(', ');
   const el = document.getElementById('order-confirm-details');
   if(el) el.innerHTML = `
@@ -2898,9 +2906,8 @@ window.loadBook = function(id, dest){
   const buyBar = document.getElementById('det-buy-bar');
   const dlBtn  = document.getElementById('dl-btn');
 
-  // ── RULE: Only isPremium:true books show Buy / Rent bar
-  //    All other books = included in subscription → Read Now + Download
-  if(b.isPremium === true){
+  // ── RULE: If premium AND NOT owned -> show Buy/Rent. Else -> show Read/Download.
+  if(b.isPremium === true && !ownedBooks.has(b.id)){
     if(buyBar){
       buyBar.style.display='flex';
       const rentBtn=buyBar.querySelector('.btn-rent');
@@ -2912,12 +2919,14 @@ window.loadBook = function(id, dest){
     }
     if(subBar) subBar.style.display='none';
   } else {
-    // Subscription book — show standard read bar
+    // Subscription book OR Owned Premium book — show standard read bar
     if(subBar) subBar.style.display='flex';
     if(buyBar) buyBar.style.display='none';
     // Add paperback option to download button label for books with paperback
-    if(dlBtn && b.paperback){
+    if(dlBtn && b.paperback && !ownedBooks.has(b.id)){
       dlBtn.title = `Also available as Paperback ₹${b.paperback}`;
+    } else if (dlBtn) {
+      dlBtn.title = '';
     }
   }
   const wb2=document.getElementById('wish-btn-2');
