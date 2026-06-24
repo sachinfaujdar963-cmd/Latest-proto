@@ -531,12 +531,24 @@ body.light {
   --bg: #ffffff; 
   --surface: #ffffff; 
   --surface2: #f0f0f0;
-  --border: #cccccc; /* Darker border for visibility */
+  --border: #cccccc; 
   --text: #000000;
   --text2: #222222;
   --nav-bg: #ffffff;
 }
 
+/* Force everything to be readable in light mode */
+body.light .global-nav, body.light .screen { background: #ffffff !important; }
+body.light .hero-title, body.light .hero-desc, body.light .hero-eyebrow { color: #000000 !important; }
+body.light .card, body.light .result-row, body.light .drawer { border: 2px solid #cccccc !important; }
+
+/* Fixed Logo CSS: Prevents stretching */
+.brand-logo-img {
+    height: 40px; 
+    width: 40px; 
+    object-fit: contain; 
+    display: block;
+}
 body.light .global-nav, 
 body.light .global-nav.solid {
     background: #ffffff !important;
@@ -803,9 +815,9 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
     <button class="nav-btn" id="btn-hamburger" onclick="toggleDrawer()" style="display:none">☰</button>
     <button class="nav-btn back-btn" id="btn-back" onclick="back()" style="display:none">←</button>
     
-<div onclick="go('s-home')" id="nav-brand" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-    <img src="https://i.postimg.cc/J4P7GRDf/logo-dark.png" class="brand-logo-img" style="height:40px; width:40px;">
-    <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:black;">PageTurn</span>
+<div onclick="go('s-home')" id="nav-brand" style="display:flex; align-items:center; gap:12px; cursor:pointer;">
+    <img src="https://i.postimg.cc/J4P7GRDf/logo-dark.png" class="brand-logo-img" alt="PageTurn" style="width:40px; height:40px;">
+    <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--text);">PageTurn</span>
 </div>
 </div>
   <div class="nav-right">
@@ -939,7 +951,10 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 <!-- ── SPLASH ── -->
 <section class="screen active" id="s-splash">
   <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:var(--bg);">
-    <div class="anim-up" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+  <div class="anim-up" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+    <img src="https://i.postimg.cc/J4P7GRDf/logo-dark.png" class="brand-logo-img" style="height: 72px; width: 72px;" alt="PageTurn">
+    <div style="font-size:13px;color:var(--text);letter-spacing:3px;text-transform:uppercase">The World's Books, In Your Pocket</div>
+</div>
       
 <div><div class="brand-logo-img" style="height: 72px; width: 280px; background-position: center; background-image: url('https://i.postimg.cc/J4P7GRDf/logo-dark.png') !important;"></div></div>
 
@@ -3164,14 +3179,6 @@ function renderPremiumRow(){
     </div>`;
   }).join('');
 }
-// Automatically swap logo src when theme toggles
-document.getElementById('btn-theme').addEventListener('click', () => {
-    const isLight = document.body.classList.contains('light');
-    const images = document.querySelectorAll('.brand-logo-img');
-    images.forEach(img => {
-        img.src = isLight ? 'logo-light.jpg' : 'logo-dark.jpg';
-    });
-});
 </script>
 </body>
 </html>
