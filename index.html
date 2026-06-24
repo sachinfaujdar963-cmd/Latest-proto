@@ -7,12 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0d0d0d; --surface:#191919; --surface2:#222; --border:#2a2a2a;
+  /* Updated to the warm, dark tone from your attached image */
+  --bg:#14110f; --surface:#1f1a18; --surface2:#292220; --border:#38302d;
   --text:#f5f2ee; --text2:#9a9aaa; --text3:#606070;
   --gold:#d4a843; --coral:#e8694a; --coral2:#c25e3e;
   --success:#4caf82; --danger:#ef4444;
   --reader:#f7f3e9; --readerText:#2c2416;
-  --nav-bg:rgba(13,13,13,0.88);
+  --nav-bg:rgba(20,17,15,0.88);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:var(--bg);font-family:'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;overflow:hidden;color:var(--text);font-size:18px;}
@@ -527,12 +528,24 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 
 /* ═══ LIGHT / DARK THEME ═══ */
 body.light{
-  --bg:#faf8f5; --surface:#ffffff; --surface2:#f0ece6;
-  --border:#e2dcd0; --text:#0f172a; --text2:#475569;
-  --text3:#94a3b8; --gold:#d97706; --coral:#c25e3e;
+  /* Updated to an appealing light pink palette instead of white */
+  --bg:#fdf2f6; --surface:#ffffff; --surface2:#fce4ec;
+  --border:#f8bbd0; --text:#3e2723; --text2:#5d4037;
+  --text3:#8d6e63; --gold:#d97706; --coral:#c25e3e;
   --coral2:#a34830; --success:#059669; --danger:#dc2626;
   --reader:#fffaf2; --readerText:#1e293b;
-  --nav-bg:rgba(250,248,245,0.92);
+  --nav-bg:rgba(253,242,246,0.92);
+}
+  /* Dynamic Image Logo Classes */
+.brand-logo-img {
+    content: url('Gemini_Generated_Image_w3bu7xw3bu7xw3bu - Copy.jpg');
+    height: 36px;
+    object-fit: contain;
+    border-radius: 8px; /* Smooths the square edges slightly */
+    cursor: pointer;
+}
+body.light .brand-logo-img {
+    content: url('Gemini_Generated_Image_jguzx2jguzx2jguz - Copy.jpg');
 }
 body.light .screen{background:var(--bg);}
 body.light .global-nav{background:linear-gradient(to bottom,rgba(250,248,245,.98),transparent);}
@@ -757,7 +770,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 
 </style>
 </head>
-<body>
+<body class="light">
 <div id="toast"></div>
 
 <!-- ══ GLOBAL NAV ══ -->
@@ -765,7 +778,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
   <div class="nav-left">
     <button class="nav-btn" id="btn-hamburger" onclick="toggleDrawer()" style="display:none">☰</button>
     <button class="nav-btn back-btn" id="btn-back" onclick="back()" style="display:none">←</button>
-    <span class="nav-brand" onclick="go('s-home')" id="nav-brand" style="display:none">Page<span>Turn</span></span>
+<img class="brand-logo-img" onclick="go('s-home')" id="nav-brand" style="display:none" alt="PageTurn">
   </div>
   <div class="nav-right">
     <button class="nav-search-btn" id="btn-search-nav" onclick="go('s-search')" style="display:none">
@@ -787,7 +800,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
 <aside class="drawer" id="drawer">
   <div class="drawer-header">
-    <div class="drawer-logo">Page<span>Turn</span></div>
+ <div class="drawer-logo"><img class="brand-logo-img" alt="PageTurn"></div>
     <div class="drawer-user" id="drawer-user">Not signed in</div>
   </div>
   <div class="drawer-scroll">
@@ -900,7 +913,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
   <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:linear-gradient(160deg,#07071a 0%,#0f0d2e 50%,#1a0a1a 100%)">
     <div class="anim-up" style="display:flex;flex-direction:column;align-items:center;gap:14px">
       <div style="width:96px;height:96px;background:linear-gradient(135deg,#d4a843,#f5c842);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 12px 40px rgba(212,168,67,.4)">📖</div>
-      <div style="font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:#f0ece3;letter-spacing:1px">PageTurn</div>
+      <div><img class="brand-logo-img" style="height: 72px;" alt="PageTurn"></div>
       <div style="font-size:13px;color:#8b8faa;letter-spacing:3px;text-transform:uppercase">The World's Books, In Your Pocket</div>
     </div>
     <div style="width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:24px">
@@ -1263,7 +1276,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
     <footer class="site-footer">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo">Page<span>Turn</span></div>
+          <div class="footer-logo"><img class="brand-logo-img" alt="PageTurn"></div>
           <div class="footer-tagline">India's Netflix for Books. 50,000+ titles, one subscription. Read anywhere, even offline.</div>
           <div class="footer-badges">
             <div class="footer-badge"><div class="footer-badge-icon">📱</div><div class="footer-badge-text">iOS & Android</div></div>
@@ -1806,7 +1819,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
   <div class="topbar"><button class="back-btn" onclick="back()">←</button><h2>About PageTurn</h2><div style="width:40px"></div></div>
   <div class="scroll">
     <div style="padding:0 24px;text-align:center;margin-bottom:32px">
-      <div style="font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:var(--text);margin-bottom:8px">Page<span style="color:var(--gold)">Turn</span></div>
+      <div><img class="brand-logo-img" style="height: 64px; margin-bottom: 8px;" alt="PageTurn"></div>
       <p class="subtle" style="max-width:360px;margin:0 auto">India's first Netflix-style subscription platform for books. Every story, every genre, one price.</p>
       <div style="display:flex;justify-content:center;gap:10px;margin-top:16px">
         <span class="pill pill-gold">Est. 2024</span>
@@ -2756,11 +2769,12 @@ document.addEventListener('keydown',e=>{
 // ═══════════════════════════════════════════════════
 // THEME TOGGLE
 // ═══════════════════════════════════════════════════
-let isDarkTheme = true;
+let isDarkTheme = false; // Changed default to Light Theme
 function toggleTheme(){
   isDarkTheme = !isDarkTheme;
   document.body.classList.toggle('light', !isDarkTheme);
-  document.getElementById('btn-theme').textContent = isDarkTheme ? '🌙' : '☀️';
+  // Show a Moon when in Light Mode (to switch to Dark), and a Sun when in Dark Mode (to switch to Light)
+  document.getElementById('btn-theme').textContent = isDarkTheme ? '☀️' : '🌙';
   showToast(isDarkTheme ? '🌙 Dark mode' : '☀️ Light mode', '');
 }
 
