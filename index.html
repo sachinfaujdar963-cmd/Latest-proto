@@ -540,15 +540,16 @@ body.light{
     display: inline-block;
     width: 160px; 
     height: 48px;
-    background-image: url('Gemini_Generated_Image_w3bu7xw3bu7xw3bu%20-%20Copy.jpg');
+    /* Uses the logo designed for dark mode (default theme) */
+    background-image: url('logo-dark.jpg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: left center;
-    border-radius: 6px;
     cursor: pointer;
 }
+/* Uses the logo designed for light mode */
 body.light .brand-logo-img {
-    background-image: url('Gemini_Generated_Image_jguzx2jguzx2jguz%20-%20Copy.jpg');
+    background-image: url('logo-light.jpg');
 }
 body.light .screen{background:var(--bg);}
 body.light .global-nav{background:linear-gradient(to bottom,rgba(250,248,245,.98),transparent);}
@@ -914,14 +915,16 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 <!-- ── SPLASH ── -->
 <section class="screen active" id="s-splash">
   <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:linear-gradient(160deg,#07071a 0%,#0f0d2e 50%,#1a0a1a 100%)">
+    
     <div class="anim-up" style="display:flex;flex-direction:column;align-items:center;gap:14px">
-      <div style="width:96px;height:96px;background:linear-gradient(135deg,#d4a843,#f5c842);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 12px 40px rgba(212,168,67,.4)">📖</div>
-      <div><div class="brand-logo-img" style="height: 72px; width: 280px; background-position: center;"></div></div>
+      <div class="brand-logo-img" style="height: 72px; width: 280px; background-position: center; background-image: url('logo-dark.jpg');"></div>
       <div style="font-size:13px;color:#8b8faa;letter-spacing:3px;text-transform:uppercase">The World's Books, In Your Pocket</div>
     </div>
+
     <div style="width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:24px">
       <div id="splash-fill" style="height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--coral));border-radius:2px;animation:splashLoad 2s ease forwards"></div>
     </div>
+
   </div>
   <style>@keyframes splashLoad{0%{width:0}100%{width:100%}}</style>
 </section>
