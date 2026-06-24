@@ -526,14 +526,30 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
   font-size:32px;margin:0 auto 20px;}
 
 /* ═══ LIGHT / DARK THEME ═══ */
-body.light{
-  /* Updated to an appealing light pink palette instead of white */
-  --bg:#fdf2f6; --surface:#ffffff; --surface2:#fce4ec;
-  --border:#f8bbd0; --text:#3e2723; --text2:#5d4037;
-  --text3:#8d6e63; --gold:#d97706; --coral:#c25e3e;
-  --coral2:#a34830; --success:#059669; --danger:#dc2626;
-  --reader:#fffaf2; --readerText:#1e293b;
-  --nav-bg:rgba(253,242,246,0.92);
+body.light {
+  /* High contrast colors for visibility */
+  --bg: #ffffff; 
+  --surface: #f8f9fa; 
+  --surface2: #e9ecef;
+  --border: #dee2e6;
+  --text: #000000;      /* Pure black text for maximum visibility */
+  --text2: #495057;     /* Dark gray secondary text */
+  --text3: #adb5bd;
+  --gold: #d97706; 
+  --coral: #c25e3e;
+  --coral2: #a34830;
+  --success: #059669;
+  --danger: #dc2626;
+  --reader: #fffaf2;
+  --readerText: #1e293b;
+  --nav-bg: #ffffff;
+}
+
+/* Force the header to be solid white */
+body.light .global-nav {
+    background: #ffffff !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    background-image: none !important; /* Removes the gradient */
 }
 /* Dynamic Image Logo Classes */
 /* FORCE LOGO LOAD FROM WEB */
@@ -914,7 +930,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 
 <!-- ── SPLASH ── -->
 <section class="screen active" id="s-splash">
-  <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:linear-gradient(160deg,#07071a 0%,#0f0d2e 50%,#1a0a1a 100%)">
+  <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:var(--bg);">
     <div class="anim-up" style="display:flex;flex-direction:column;align-items:center;gap:14px">
       
 <div><div class="brand-logo-img" style="height: 72px; width: 280px; background-position: center; background-image: url('https://i.postimg.cc/J4P7GRDf/logo-dark.png') !important;"></div></div>
