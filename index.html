@@ -536,20 +536,19 @@ body.light{
   --nav-bg:rgba(253,242,246,0.92);
 }
 /* Dynamic Image Logo Classes */
+/* FORCE LOGO LOAD */
 .brand-logo-img {
-    display: inline-block;
-    width: 160px; 
-    height: 48px;
-    /* Uses the logo designed for dark mode (default theme) */
-    background-image: url('logo-dark.jpg');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: left center;
-    cursor: pointer;
+    display: inline-block !important;
+    width: 160px !important;
+    height: 48px !important;
+    background-image: url('logo-dark.jpg') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: left center !important;
+    cursor: pointer !important;
 }
-/* Uses the logo designed for light mode */
 body.light .brand-logo-img {
-    background-image: url('logo-light.jpg');
+    background-image: url('logo-light.jpg') !important;
 }
 body.light .screen{background:var(--bg);}
 body.light .global-nav{background:linear-gradient(to bottom,rgba(250,248,245,.98),transparent);}
@@ -915,16 +914,15 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 <!-- ── SPLASH ── -->
 <section class="screen active" id="s-splash">
   <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:linear-gradient(160deg,#07071a 0%,#0f0d2e 50%,#1a0a1a 100%)">
-    
     <div class="anim-up" style="display:flex;flex-direction:column;align-items:center;gap:14px">
-      <div class="brand-logo-img" style="height: 72px; width: 280px; background-position: center; background-image: url('logo-dark.jpg');"></div>
+      
+      <div class="brand-logo-img" style="height: 72px; width: 280px; background-position: center; background-image: url('logo-dark.jpg') !important;"></div>
+      
       <div style="font-size:13px;color:#8b8faa;letter-spacing:3px;text-transform:uppercase">The World's Books, In Your Pocket</div>
     </div>
-
     <div style="width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:24px">
       <div id="splash-fill" style="height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--coral));border-radius:2px;animation:splashLoad 2s ease forwards"></div>
     </div>
-
   </div>
   <style>@keyframes splashLoad{0%{width:0}100%{width:100%}}</style>
 </section>
