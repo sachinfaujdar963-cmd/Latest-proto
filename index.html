@@ -214,7 +214,7 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
 /* ── HOME HERO (Netflix) ── */
 .home-hero{position:relative;width:100%;height:85vh;min-height:580px;background-size:cover;
   background-position:center;display:flex;flex-direction:column;
-  justify-content:flex-end;padding:120px 52px 64px;color:#fff;
+  justify-content:center;padding:120px 52px 64px;color:#fff;
   transition:background-image .8s ease;}
 .home-hero::before{content:'';position:absolute;inset:0;
   background:linear-gradient(to right,rgba(13,13,13,.92) 0%,rgba(13,13,13,.45) 55%,transparent 100%);}
@@ -519,7 +519,6 @@ button{cursor:pointer;} a{color:inherit;text-decoration:none;}
   .hero-title{font-size:88px;}
   .home-hero{height:90vh;padding:140px 60px 80px;}
 }
-}
 /* ── NO RESULTS ── */
 .empty-state{padding:80px 32px;text-align:center;}
 .empty-icon{width:80px;height:80px;border-radius:50%;background:var(--surface);
@@ -539,9 +538,9 @@ body.light{
 /* Dynamic Image Logo Classes */
 .brand-logo-img {
     display: inline-block;
-    width: 140px; /* Gives the background image space to show */
-    height: 36px;
-    background-image: url('Gemini_Generated_Image_w3bu7xw3bu7xw3bu - Copy.jpg');
+    width: 160px; 
+    height: 48px;
+    background-image: url('Gemini_Generated_Image_w3bu7xw3bu7xw3bu%20-%20Copy.jpg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: left center;
@@ -549,7 +548,7 @@ body.light{
     cursor: pointer;
 }
 body.light .brand-logo-img {
-    background-image: url('Gemini_Generated_Image_jguzx2jguzx2jguz - Copy.jpg');
+    background-image: url('Gemini_Generated_Image_jguzx2jguzx2jguz%20-%20Copy.jpg');
 }
 body.light .screen{background:var(--bg);}
 body.light .global-nav{background:linear-gradient(to bottom,rgba(250,248,245,.98),transparent);}
@@ -804,7 +803,7 @@ body.light .site-footer{background:var(--surface);border-color:var(--border);}
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
 <aside class="drawer" id="drawer">
   <div class="drawer-header">
- <div class="drawer-logo"><div class="brand-logo-img"></div></div>
+ <div class="drawer-logo" style="display: flex; align-items: center; height: 36px;"><div class="brand-logo-img" style="margin: 0;"></div></div>
     <div class="drawer-user" id="drawer-user">Not signed in</div>
   </div>
   <div class="drawer-scroll">
